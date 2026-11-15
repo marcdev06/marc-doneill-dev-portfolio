@@ -28,6 +28,8 @@ export default defineConfig({
   ],
   webServer: {
     command: `npx next build && npx next start --port ${String(port)}`,
+    // Never email from tests; the action logs messages instead
+    env: { CONTACT_DELIVERY: 'log' },
     url: baseUrl,
     reuseExistingServer: false,
     timeout: 180_000,

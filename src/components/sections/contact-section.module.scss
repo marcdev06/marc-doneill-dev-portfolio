@@ -12,14 +12,25 @@
   }
 }
 
+.formSlot {
+  padding-bottom: 2rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--pf-surface-border);
+}
+
 .email {
   display: inline-flex;
   gap: 0.625rem;
   align-items: center;
   min-height: 2.75rem;
-  font-size: 1.0625rem;
+  // Fits the text before the @ on one line at 320 px
+  font-size: 0.9375rem;
   font-weight: $font-weight-semibold;
   overflow-wrap: anywhere;
+
+  @include media-breakpoint-up(sm) {
+    font-size: 1.0625rem;
+  }
 
   @include media-breakpoint-up(md) {
     font-size: 1.25rem;

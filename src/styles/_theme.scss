@@ -23,6 +23,8 @@ $pf-ring: #fff;
 $pf-ring-dark: rgba(143, 201, 184, 0.45);
 $pf-ring-soft: rgba(47, 107, 94, 0.12);
 $pf-ring-soft-dark: rgba(143, 201, 184, 0.08);
+$pf-input-border: #74847e;
+$pf-input-border-dark: #6b7d77;
 $pf-header-height: 4.5rem;
 
 // Brand and type
@@ -108,3 +110,13 @@ $badge-color: var(--bs-body-color);
 $badge-padding-y: 0.5em;
 $badge-padding-x: 0.875em;
 $badge-border-radius: 50rem;
+
+// Forms: 44 px inputs, borders at 3:1 on the card
+$form-label-font-weight: 600;
+$input-padding-y: 0.5625rem;
+$input-padding-x: 1rem;
+$input-border-color: var(--pf-input-border);
+$input-border-radius: 0.75rem;
+$input-focus-border-color: var(--pf-accent-text);
+$form-feedback-invalid-color: #b02a37;
+$form-feedback-icon-invalid-color: #d9505d;

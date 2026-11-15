@@ -54,7 +54,27 @@ export function buildHomeInput(): z.input<typeof homeSchema> {
       paragraph: 'I build things.',
       howIWork: { heading: 'How I work', text: 'Carefully.' },
     },
-    contact: { heading: "Let's talk", resumeLabel: 'Download resume' },
+    contact: {
+      heading: "Let's talk",
+      resumeLabel: 'Download resume',
+      form: buildContactFormCopyInput(),
+    },
+  };
+}
+
+export function buildContactFormCopyInput(): z.input<typeof homeSchema>['contact']['form'] {
+  return {
+    fields: {
+      name: { label: 'Your name', error: 'Name error.' },
+      email: { label: 'Your email', error: 'Email error.' },
+      message: { label: 'Your message', error: 'Message error.' },
+    },
+    honeypotLabel: 'Website',
+    submitLabel: 'Send',
+    pendingLabel: 'Sending now',
+    privacyNote: "This site doesn't store it.",
+    successMessage: 'Sent, thanks.',
+    failureMessage: { beforeEmail: 'Not sent. Write to ', afterEmail: ' instead.' },
   };
 }
 

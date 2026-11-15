@@ -7,6 +7,7 @@ import { experience } from '@/content/experience';
 import { home } from '@/content/home';
 import { profile } from '@/content/profile';
 import { skills } from '@/content/skills';
+import { ContactForm } from '@/features/contact/contact-form';
 import { listSkillTiers } from '@/lib/content';
 
 export default function HomePage() {
@@ -20,7 +21,11 @@ export default function HomePage() {
         orbitCenterLabel={profile.monogram}
       />
       <AboutSection about={home.about} />
-      <ContactSection contact={home.contact} profile={profile} />
+      <ContactSection
+        contact={home.contact}
+        profile={profile}
+        form={<ContactForm copy={home.contact.form} email={profile.email} />}
+      />
     </>
   );
 }

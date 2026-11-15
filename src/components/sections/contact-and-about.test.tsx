@@ -6,7 +6,25 @@ import { AboutSection } from './about-section';
 import { ContactSection } from './contact-section';
 
 describe('ContactSection', () => {
-  it('offers email, profiles and the resume download, with no form yet', () => {
+  it('renders the form slot below the intro and above the direct links', () => {
+    render(
+      <ContactSection
+        contact={home.contact}
+        profile={profile}
+        form={<form aria-label="Slot form" />}
+      />,
+    );
+
+    const section = screen.getByRole('region', { name: "Let's build something" });
+    const slotForm = within(section).getByRole('form', { name: 'Slot form' });
+    const intro = within(section).getByText(profile.availability.detail);
+    const emailLink = within(section).getByRole('link', { name: profile.email });
+    expect(intro.compareDocumentPosition(slotForm)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(slotForm.compareDocumentPosition(emailLink)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(within(section).getByRole('link', { name: 'Download resume' })).toBeVisible();
+  });
+
+  it('offers email, profiles and the resume download without a form slot', () => {
     const { container } = render(<ContactSection contact={home.contact} profile={profile} />);
 
     const section = screen.getByRole('region', { name: "Let's build something" });

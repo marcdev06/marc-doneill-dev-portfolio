@@ -1,7 +1,12 @@
 export { computeContentHash, toCanonicalJson } from './content-hash';
 export { educationSchema, type EducationEntry } from './education-schema';
 export { experienceSchema, type ExperienceEntry, type ExperienceRole } from './experience-schema';
-export { homeSchema, type HeroContent, type HomeContent } from './home-schema';
+export {
+  homeSchema,
+  type ContactFormCopy,
+  type HeroContent,
+  type HomeContent,
+} from './home-schema';
 export { formatIsoMonth, isoMonthSchema } from './iso-month';
 export { parseContent } from './parse-content';
 export { profileSchema, type Profile } from './profile-schema';

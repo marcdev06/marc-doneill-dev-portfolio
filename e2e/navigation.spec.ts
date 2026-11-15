@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectHeadingBelowHeader } from './helpers';
+import { expectHeadingBelowHeader, readRenderedLines } from './helpers';
 
 const sectionHeadings = [
   { linkName: 'Experience', headingName: 'Experience' },
@@ -61,19 +61,35 @@ test.describe('mobile menu', () => {
   });
 });
 
-test.describe('phone layout', () => {
-  test.use({ viewport: { width: 375, height: 812 } });
+for (const phoneWidth of [375, 320]) {
+  test.describe(`phone layout at ${String(phoneWidth)} px`, () => {
+    test.use({ viewport: { width: phoneWidth, height: 812 } });
 
-  test('has no horizontal scroll at 375 px', async ({ page }) => {
-    await page.goto('/');
+    test('has no horizontal scroll', async ({ page }) => {
+      await page.goto('/');
 
-    const pageWidths = await page.evaluate(() => ({
-      scrollWidth: document.documentElement.scrollWidth,
-      clientWidth: document.documentElement.clientWidth,
-    }));
-    expect(pageWidths.scrollWidth).toBe(pageWidths.clientWidth);
+      const pageWidths = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+      }));
+      expect(pageWidths.scrollWidth).toBe(pageWidths.clientWidth);
+    });
+
+    test('wraps the contact email only after the @', async ({ page }) => {
+      await page.goto('/');
+
+      const emailLink = page.getByRole('link', {
+        name: 'balatayo.marcdoneill@gmail.com',
+        exact: true,
+      });
+      await expect(emailLink).toHaveAttribute('href', 'mailto:balatayo.marcdoneill@gmail.com');
+      expect([
+        ['balatayo.marcdoneill@gmail.com'],
+        ['balatayo.marcdoneill@', 'gmail.com'],
+      ]).toContainEqual(await readRenderedLines(emailLink));
+    });
   });
-});
+}
 
 test.describe('touch targets', () => {
   test('makes every standalone control at least 44 px', async ({ page, isMobile }) => {
@@ -89,6 +105,10 @@ test.describe('touch targets', () => {
       page.getByRole('link', { name: 'Download resume' }),
       page.getByRole('link', { name: 'Built with Next.js + Bootstrap' }),
       page.getByRole('link', { name: 'Marc Balatayo' }),
+      page.getByLabel('Name', { exact: true }),
+      page.getByLabel('Email', { exact: true }),
+      page.getByLabel('Message', { exact: true }),
+      page.getByRole('button', { name: 'Send message' }),
       isMobile
         ? page.getByRole('button', { name: 'Open menu' })
         : page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'About' }),

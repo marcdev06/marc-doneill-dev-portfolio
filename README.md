@@ -12,6 +12,8 @@ Marc Doneill Balatayo's portfolio site. It is statically prerendered and deploye
 
 The resume PDF (`public/resume.pdf`) is generated from the same content as the site by `npm run resume:pdf`, and a unit test fails if the content changes without regenerating it.
 
+The contact form is a Server Action. It validates with zod on the server and emails through [Resend](https://resend.com). Spam protection is a honeypot field plus [Vercel BotID](https://vercel.com/docs/botid). The site doesn't store messages; Resend keeps its own sending logs.
+
 ## Getting started
 
 Requires Node 24 (see `.nvmrc`).
@@ -21,7 +23,9 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:3000. Copy `.env.example` to `.env.local` to set `NEXT_PUBLIC_SITE_URL`.
+Open http://localhost:3000. Copy `.env.example` to `.env.local` to set `NEXT_PUBLIC_SITE_URL` and the contact form variables.
+
+`CONTACT_DELIVERY=log` (the example's value) prints contact messages to the server console instead of emailing them. To send real email, set `CONTACT_DELIVERY=resend`, `RESEND_API_KEY` and `CONTACT_TO_EMAIL`. Tests and e2e always use log mode. BotID only verifies visitors on Vercel; locally and in tests it treats every visitor as human.
 
 Before the first e2e run, install the browser with `npx playwright install chromium`.
 
