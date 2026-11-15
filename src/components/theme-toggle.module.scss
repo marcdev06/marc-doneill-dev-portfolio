@@ -1,0 +1,13 @@
+.sunIcon,
+.moonIcon {
+  font-size: 1.125rem;
+}
+
+.moonIcon,
+:global([data-bs-theme='light']) .sunIcon {
+  display: none;
+}
+
+:global([data-bs-theme='light']) .moonIcon {
+  display: block;
+}

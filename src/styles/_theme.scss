@@ -1,11 +1,110 @@
-// Placeholder overrides: M1 replaces these with design.md tokens
-$primary: #0a58ca;
-$font-family-sans-serif:
-  var(--font-sans),
-  system-ui,
-  -apple-system,
-  'Segoe UI',
-  Roboto,
-  'Helvetica Neue',
-  Arial,
-  sans-serif;
+// Tokens from design.md; dark overrides must precede variables-dark
+
+// Portfolio tokens Bootstrap has no variables for
+$pf-accent-text: #24574c;
+$pf-accent-text-dark: #8fc9b8;
+$pf-warm: #9a5b2e;
+$pf-warm-dark: #e3a76f;
+$pf-warm-text: #7d4a24;
+$pf-warm-text-dark: #e3a76f;
+$pf-warm-soft: rgba(181, 118, 63, 0.12);
+$pf-warm-soft-dark: rgba(227, 167, 111, 0.12);
+$pf-warm-border: rgba(154, 91, 46, 0.35);
+$pf-warm-border-dark: rgba(227, 167, 111, 0.35);
+$pf-glow: rgba(47, 107, 94, 0.2);
+$pf-glow-dark: rgba(70, 140, 120, 0.32);
+$pf-glow-warm: rgba(181, 134, 83, 0.14);
+$pf-glow-warm-dark: rgba(227, 167, 111, 0.1);
+$pf-surface: #fff;
+$pf-surface-dark: #16211d;
+$pf-border-strong: #b9c7c1;
+$pf-border-strong-dark: rgba(255, 255, 255, 0.22);
+$pf-ring: #fff;
+$pf-ring-dark: rgba(143, 201, 184, 0.45);
+$pf-ring-soft: rgba(47, 107, 94, 0.12);
+$pf-ring-soft-dark: rgba(143, 201, 184, 0.08);
+$pf-header-height: 4.5rem;
+
+// Brand and type
+$primary: #2f6b5e;
+$warning: #e3a76f;
+$font-family-sans-serif: var(--font-poppins), system-ui, sans-serif;
+$line-height-base: 1.6;
+$headings-font-weight: 700;
+$headings-line-height: 1.2;
+$h1-font-size: 2.5rem;
+$h2-font-size: 3rem;
+$h3-font-size: 1.25rem;
+$lead-font-size: 1.125rem;
+$lead-font-weight: 400;
+
+// Shape and spacing
+$border-radius: 1rem;
+$border-radius-sm: 0.5rem;
+$border-radius-lg: 1.25rem;
+$spacer: 1rem;
+$spacers: (
+  0: 0,
+  1: $spacer * 0.25,
+  2: $spacer * 0.5,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 3,
+  6: $spacer * 4,
+  7: $spacer * 6,
+);
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+);
+$container-padding-x: 2.5rem;
+
+// Light theme (Bootstrap's base colour mode)
+$body-bg: #f4f6f2;
+$body-color: #14201c;
+$body-secondary-color: #4a5a55;
+$border-color: #dfe6e2;
+$link-color: $pf-accent-text;
+$link-underline-offset: 0.2em;
+
+// Dark theme (the default on <html>)
+$body-bg-dark: #0f1714;
+$body-color-dark: #e8eeeb;
+$body-secondary-color-dark: #a9b8b3;
+$border-color-dark: rgba(#fff, 0.08);
+$primary-text-emphasis-dark: $pf-accent-text-dark;
+$link-color-dark: $pf-accent-text-dark;
+
+// Components, sized for 44 px touch targets
+$btn-padding-y: 0.6875rem;
+$btn-padding-x: 1.625rem;
+$btn-line-height: 1.5;
+$btn-font-weight: 600;
+$btn-border-radius: 50rem;
+$btn-border-radius-sm: 50rem;
+$btn-border-radius-lg: 50rem;
+$btn-transition:
+  color 0.15s ease-in-out,
+  background-color 0.15s ease-in-out,
+  border-color 0.15s ease-in-out,
+  box-shadow 0.15s ease-in-out,
+  transform 0.18s ease-out;
+$nav-link-font-size: 0.9375rem;
+$nav-link-color: var(--bs-secondary-color);
+$nav-link-hover-color: var(--bs-body-color);
+$nav-link-padding-y: 0.625rem;
+$nav-link-padding-x: 0.875rem;
+$card-bg: var(--pf-surface);
+$card-border-color: var(--pf-surface-border);
+$card-spacer-y: 1.5rem;
+$card-spacer-x: 1.5rem;
+$offcanvas-horizontal-width: 20rem;
+$offcanvas-bg-color: var(--pf-surface);
+$badge-font-size: 0.875rem;
+$badge-font-weight: 400;
+$badge-color: var(--bs-body-color);
+$badge-padding-y: 0.5em;
+$badge-padding-x: 0.875em;
+$badge-border-radius: 50rem;

@@ -1,0 +1,97 @@
+@import '../../styles/module-helpers';
+
+.timeline {
+  position: relative;
+  display: grid;
+  gap: 1.5rem;
+  padding: 0 0 0 2rem;
+  margin: 0;
+  list-style: none;
+
+  &::before {
+    position: absolute;
+    top: 1.75rem;
+    bottom: 1.75rem;
+    left: 0.4375rem;
+    width: 2px;
+    content: '';
+    background: linear-gradient(var(--pf-accent-text), transparent);
+    opacity: 0.5;
+  }
+}
+
+.timelineItem {
+  position: relative;
+
+  &::before {
+    position: absolute;
+    top: 1.75rem;
+    left: -2rem;
+    width: 1rem;
+    height: 1rem;
+    content: '';
+    background-color: var(--#{$prefix}body-bg);
+    border: 2px solid var(--pf-accent-text);
+    border-radius: 50%;
+    box-shadow: 0 0 0.75rem var(--pf-glow);
+  }
+}
+
+.glowCard {
+  border-top-color: color-mix(in srgb, var(--pf-accent-text) 45%, transparent);
+  box-shadow: 0 1.5rem 3rem -2rem var(--pf-glow);
+
+  &:hover {
+    border-top-color: var(--pf-accent-text);
+    box-shadow: 0 1.75rem 3.5rem -1.5rem var(--pf-glow);
+  }
+}
+
+.cardLayout {
+  @include media-breakpoint-up(lg) {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    column-gap: 3rem;
+  }
+}
+
+.roles {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0;
+  margin: 1rem 0;
+  list-style: none;
+
+  @include media-breakpoint-up(lg) {
+    gap: 0.75rem;
+    margin-bottom: 0;
+  }
+}
+
+.role {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.75rem;
+  align-items: baseline;
+
+  @include media-breakpoint-up(lg) {
+    flex-direction: column;
+  }
+}
+
+.details {
+  @include media-breakpoint-up(lg) {
+    padding-left: 1.5rem;
+    margin-left: -1.5rem;
+    border-left: 1px solid var(--pf-surface-border);
+  }
+}
+
+.bullets {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 46rem;
+  padding-left: 1.25rem;
+  margin: 0;
+  color: var(--#{$prefix}secondary-color);
+}

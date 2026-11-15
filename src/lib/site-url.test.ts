@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getSiteUrl } from './site-url';
+import { getConfiguredSiteUrl, getSiteUrl } from './site-url';
 
 function stubSiteEnvironment(
   siteUrl: string | undefined,
@@ -58,5 +58,23 @@ describe('getSiteUrl', () => {
     stubSiteEnvironment(undefined, 'portfolio.vercel.app/');
 
     expect(getSiteUrl().href).toBe('https://portfolio.vercel.app/');
+  });
+});
+
+describe('getConfiguredSiteUrl', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('returns undefined when no public URL is configured', () => {
+    stubSiteEnvironment(undefined, undefined);
+
+    expect(getConfiguredSiteUrl()).toBeUndefined();
+  });
+
+  it('returns the configured URL when one is set', () => {
+    stubSiteEnvironment(undefined, 'portfolio.vercel.app');
+
+    expect(getConfiguredSiteUrl()?.href).toBe('https://portfolio.vercel.app/');
   });
 });
