@@ -1,6 +1,6 @@
 {
   "name": "marc-doneill-dev-portfolio",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -18,9 +18,11 @@
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "e2e": "playwright test",
+    "lighthouse": "lhci autorun",
     "resume:pdf": "node scripts/generate-resume-pdf.ts"
   },
   "dependencies": {
+    "@vercel/analytics": "~2.0.1",
     "bootstrap": "5.3.9",
     "botid": "~1.5.13",
     "next": "16.4.6",
@@ -34,6 +36,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "~4.14.0",
+    "@lhci/cli": "~0.16.1",
     "@playwright/test": "1.65.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
@@ -49,6 +52,7 @@
     "jsdom": "^31.0.1",
     "prettier": "~3.10.1",
     "sass": "~1.108.2",
+    "schema-dts": "~2.1.0",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.2",
     "vitest": "^5.1.0"

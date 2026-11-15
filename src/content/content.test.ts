@@ -16,6 +16,16 @@ describe('site content', () => {
     ]);
   });
 
+  it('describes the site for search engines and link previews', () => {
+    expect(site.locale).toBe('en_PH');
+    expect(site.openGraphImageAlt).toContain(profile.name);
+    expect(site.openGraphImageAlt).toContain(
+      `${home.hero.headline.beforeHighlight}${home.hero.headline.highlight}`,
+    );
+    expect(site.resumePage.title).toBe('Resume');
+    expect(site.resumePage.description).toContain(profile.name);
+  });
+
   it('uses the approved hero copy', () => {
     expect(home.hero.headline).toEqual({
       beforeHighlight: 'Building software that makes life easier for ',

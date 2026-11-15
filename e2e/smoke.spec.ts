@@ -28,7 +28,11 @@ test.describe('site shell', () => {
     for (const sectionId of ['experience', 'skills', 'about', 'contact']) {
       await expect(page.locator(`section#${sectionId}`)).toHaveCount(1);
     }
-    await expect(page.getByRole('contentinfo')).toContainText('Design inspired by Motionfolio');
+    const footer = page.getByRole('contentinfo');
+    await expect(footer).toContainText('Marc Doneill Balatayo');
+    await expect(
+      footer.getByRole('link', { name: 'Built with Next.js + Bootstrap' }),
+    ).toHaveAttribute('href', 'https://github.com/marcdev06/marc-doneill-dev-portfolio');
   });
 
   test('serves the not-found page with HTTP 404 for an unknown URL', async ({ page }) => {

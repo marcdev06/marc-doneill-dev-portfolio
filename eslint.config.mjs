@@ -84,6 +84,7 @@ export default defineConfig([
     'coverage/**',
     'playwright-report/**',
     'test-results/**',
+    '.lighthouseci/**',
     '.claude/**',
     'next-env.d.ts',
   ]),

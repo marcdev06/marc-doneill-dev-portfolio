@@ -13,8 +13,10 @@ export function buildSiteInput(): z.input<typeof siteSchema> {
     name: 'Ada Example',
     homeTitle: 'Ada Example · Engineer',
     description: 'Builds dependable web apps.',
+    locale: 'en_GB',
+    openGraphImageAlt: 'Ada Example, Engineer',
+    resumePage: { title: 'CV', description: 'The CV of Ada Example.' },
     repository: { label: 'Source', href: 'https://example.com/source' },
-    designCredit: { label: 'Credit', href: 'https://example.com/credit' },
     navigationLinks: [{ label: 'Experience', href: '/#experience' }],
   };
 }
@@ -25,7 +27,7 @@ export function buildProfileInput(): z.input<typeof profileSchema> {
     shortName: 'Ada E.',
     monogram: 'AE',
     title: 'Software Engineer',
-    location: 'Example City',
+    location: 'Example City, GB',
     timeZoneLabel: 'Example time (UTC+0)',
     availability: { headline: 'Open to contracts', detail: 'Open to contract work.' },
     email: 'ada@example.com',
