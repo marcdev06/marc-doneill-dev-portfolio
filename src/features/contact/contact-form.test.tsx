@@ -17,7 +17,7 @@ const typedValues = {
 };
 
 function renderContactForm() {
-  render(<ContactForm copy={home.contact.form} email={profile.email} />);
+  render(<ContactForm copy={home.contact.form} linkedinUrl={profile.links.linkedin} />);
   return {
     nameField: screen.getByLabelText('Name'),
     emailField: screen.getByLabelText('Email'),
@@ -160,16 +160,17 @@ describe('ContactForm', () => {
     expect(statusRegion).toBeEmptyDOMElement();
   });
 
-  it('shows the failure message with a mailto link and keeps the values', async () => {
+  it('shows the failure message with a LinkedIn link and keeps the values', async () => {
     resolveWith({ status: 'failed', values: typedValues });
 
     const { nameField, messageField, statusRegion } = await fillAndSubmit();
 
-    const failureLink = await within(statusRegion).findByRole('link', { name: profile.email });
-    expect(failureLink).toHaveAttribute('href', `mailto:${profile.email}`);
+    const failureLink = await within(statusRegion).findByRole('link', { name: 'LinkedIn' });
+    expect(failureLink).toHaveAttribute('href', 'https://www.linkedin.com/in/marcdev06');
     expect(statusRegion).toHaveTextContent(
-      `Sorry, your message couldn't be sent. Please email me directly at ${profile.email}.`,
+      "Sorry, your message couldn't be sent. Please try again in a few minutes, or message me on LinkedIn.",
     );
+    expect(statusRegion.querySelector('a[href^="mailto"]')).toBeNull();
     expect(nameField).toHaveValue(typedValues.name);
     expect(messageField).toHaveValue(typedValues.message);
   });

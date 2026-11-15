@@ -1,7 +1,7 @@
 export const defaultContactFromAddress = 'Portfolio contact <onboarding@resend.dev>';
 
 export type ContactDeliveryConfig =
-  | { mode: 'log' }
+  | { mode: 'log'; logFilePath?: string }
   | { mode: 'resend'; apiKey: string; toAddress: string; fromAddress: string }
   | { mode: 'unconfigured'; problem: string };
 
@@ -17,7 +17,10 @@ export function readContactDeliveryConfig(
 ): ContactDeliveryConfig {
   const deliveryMode = readSetting(environment, 'CONTACT_DELIVERY') ?? 'resend';
   if (deliveryMode === 'log') {
-    return { mode: 'log' };
+    // E2e reads review links from this file; never on Vercel
+    const logFilePath =
+      environment.VERCEL === '1' ? undefined : readSetting(environment, 'CONTACT_LOG_FILE');
+    return logFilePath === undefined ? { mode: 'log' } : { mode: 'log', logFilePath };
   }
   if (deliveryMode !== 'resend') {
     return {

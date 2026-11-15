@@ -1,9 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-const indexedPages = [
-  { path: '/', title: 'Marc Doneill Balatayo · Full-Stack Software Engineer' },
-  { path: '/resume', title: 'Resume · Marc Doneill Balatayo' },
-];
+const indexedPages = [{ path: '/', title: 'Marc Doneill Balatayo · Full-Stack Software Engineer' }];
 
 function toAbsoluteUrl(href: string | null): URL {
   // Throws for relative URLs, which crawlers resolve inconsistently
@@ -54,9 +51,7 @@ test.describe('crawler files', () => {
     expect(sitemapUrl.pathname).toBe('/sitemap.xml');
   });
 
-  test('sitemap.xml lists exactly the home and resume pages as absolute URLs', async ({
-    request,
-  }) => {
+  test('sitemap.xml lists only the home page as an absolute URL', async ({ request }) => {
     const response = await request.get('/sitemap.xml');
 
     expect(response.status()).toBe(200);
@@ -64,7 +59,7 @@ test.describe('crawler files', () => {
     const listedUrls = [...sitemapXml.matchAll(/<loc>(.*?)<\/loc>/g)].map((locMatch) =>
       toAbsoluteUrl(locMatch[1] ?? null),
     );
-    expect(listedUrls.map((listedUrl) => listedUrl.pathname)).toEqual(['/', '/resume']);
+    expect(listedUrls.map((listedUrl) => listedUrl.pathname)).toEqual(['/']);
     expect(sitemapXml).not.toContain('<lastmod>');
   });
 
@@ -111,8 +106,8 @@ test.describe('page metadata', () => {
       expect(await readMetaContent(page, 'meta[property="og:description"]')).toBe(
         await readMetaContent(page, 'meta[name="description"]'),
       );
-      expect(await readMetaContent(page, 'meta[property="og:image:alt"]')).toContain(
-        'every Filipino',
+      expect(await readMetaContent(page, 'meta[property="og:image:alt"]')).toBe(
+        'Marc Doneill Balatayo, Full-Stack Software Engineer: Building software that makes everyday life easier.',
       );
       expect(await readMetaContent(page, 'meta[name="twitter:card"]')).toBe('summary_large_image');
       expect(await readMetaContent(page, 'meta[name="theme-color"]')).toBe('#0f1714');
@@ -152,7 +147,7 @@ test.describe('page metadata', () => {
 });
 
 test.describe('security headers', () => {
-  for (const path of ['/', '/resume']) {
+  for (const path of ['/', '/api/resume/download']) {
     test(`are sent with ${path}`, async ({ request }) => {
       const response = await request.get(path);
 
@@ -168,9 +163,33 @@ test.describe('security headers', () => {
 });
 
 test.describe('clean pages', () => {
-  for (const path of ['/', '/resume']) {
+  for (const path of ['/']) {
     test(`${path} logs no console errors and has no failed requests`, async ({ page }) => {
       expect(await collectPageProblems(page, path)).toEqual([]);
     });
   }
+});
+
+test.describe('privacy', () => {
+  test('the home page carries no email address and no mailto link', async ({ request }) => {
+    const homeHtml = await (await request.get('/')).text();
+
+    expect(homeHtml).not.toMatch(/href="mailto/i);
+    expect(homeHtml).not.toContain('@gmail.com');
+    const emailAddresses = homeHtml.match(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g) ?? [];
+    // Only the form copy's placeholder address may appear
+    expect(new Set(emailAddresses)).toEqual(new Set(['name@example.com']));
+  });
+
+  test('the old public resume PDF is gone', async ({ request }) => {
+    expect((await request.get('/resume.pdf')).status()).toBe(404);
+    expect((await request.get('/resume.meta.json')).status()).toBe(404);
+  });
+
+  test('the local resume page is kept out of search indexes', async ({ page }) => {
+    await page.goto('/resume');
+
+    expect(await readMetaContent(page, 'meta[name="robots"]')).toBe('noindex, nofollow');
+    await expect(page).toHaveTitle('Marc Doneill Balatayo – CV');
+  });
 });

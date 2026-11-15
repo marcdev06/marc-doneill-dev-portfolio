@@ -1,17 +1,17 @@
 import type { ReactNode } from 'react';
 import type { HomeContent, Profile } from '@/lib/content';
-import { DownloadIcon, EnvelopeIcon, GithubIcon, LinkedinIcon } from '../ui/icons';
-import { EmailAddress } from '../ui/email-address';
+import { GithubIcon, LinkedinIcon } from '../ui/icons';
 import { joinClassNames } from '../ui/join-class-names';
 import styles from './contact-section.module.scss';
 
 interface ContactSectionProps {
-  contact: HomeContent['contact'];
+  contact: Pick<HomeContent['contact'], 'heading'>;
   profile: Profile;
   form?: ReactNode;
+  resumeRequest?: ReactNode;
 }
 
-export function ContactSection({ contact, profile, form }: ContactSectionProps) {
+export function ContactSection({ contact, profile, form, resumeRequest }: ContactSectionProps) {
   return (
     <section id="contact" className="py-6 py-lg-7" aria-labelledby="contact-heading">
       <div className="container">
@@ -22,11 +22,7 @@ export function ContactSection({ contact, profile, form }: ContactSectionProps) 
             </h2>
             <p className="lead text-body-secondary mb-4">{profile.availability.detail}</p>
             {form && <div className={styles.formSlot}>{form}</div>}
-            <a className={styles.email} href={`mailto:${profile.email}`}>
-              <EnvelopeIcon className={styles.emailIcon} />
-              <EmailAddress address={profile.email} />
-            </a>
-            <div className="d-flex flex-wrap justify-content-center align-items-center gap-3 mt-4">
+            <div className="d-flex flex-wrap justify-content-center align-items-center gap-3">
               <a
                 className="btn btn-icon rounded-circle"
                 href={profile.links.github}
@@ -41,10 +37,7 @@ export function ContactSection({ contact, profile, form }: ContactSectionProps) 
               >
                 <LinkedinIcon className="fs-5" />
               </a>
-              <a className="btn btn-primary btn-glow" href={profile.resumePath} download>
-                <DownloadIcon className="me-2" />
-                {contact.resumeLabel}
-              </a>
+              {resumeRequest}
             </div>
           </div>
         </div>

@@ -24,7 +24,12 @@ describe('ExperienceSection', () => {
       'href',
       'https://kwik.care/kwikcare',
     );
-    expect(kwikCareCard).toHaveTextContent('A health care plan (HMO) provider');
+    expect(kwikCareCard).toHaveTextContent(
+      'A digital insurance brokerage and subscription-based HMO (Health Maintenance Organization) provider in the Philippines',
+    );
+    expect(screen.getByRole('article', { name: 'Singlife Philippines' })).toHaveTextContent(
+      'A mobile-first, digital life insurance and financial services company in the Philippines',
+    );
     expect(kwikCareCard).toHaveTextContent('Sep 2025 – Present');
     expect(kwikCareCard.querySelector('time')).toHaveAttribute('dateTime', '2025-09');
   });

@@ -3,11 +3,12 @@ import type { SkillTier } from '@/lib/content';
 import { joinClassNames } from '../ui/join-class-names';
 import { SimpleIconMark } from '../ui/simple-icon-mark';
 import { findSkillIcon } from './skill-icons';
-import styles from './skill-orbit.module.scss';
 
 interface SkillOrbitProps {
   tiers: readonly SkillTier[];
-  centerLabel: string;
+  centerLabel?: string;
+  isPrintSnapshot?: boolean;
+  className?: string;
 }
 
 // Odd rings shift half a step so icons interleave
@@ -17,10 +18,20 @@ function placeOnRing(iconIndex: number, iconCount: number, ringIndex: number): C
   return { '--orbit-angle': `${String(angleDegrees)}deg` } as CSSProperties;
 }
 
-export function SkillOrbit({ tiers, centerLabel }: SkillOrbitProps) {
+// Print snapshots stay still and add nothing to a PDF's text
+export function SkillOrbit({
+  tiers,
+  centerLabel,
+  isPrintSnapshot = false,
+  className,
+}: SkillOrbitProps) {
   return (
-    <div className={styles.orbit} aria-hidden="true" data-testid="skill-orbit">
-      <div className={styles.center}>{centerLabel}</div>
+    <div
+      className={joinClassNames('pf-orbit', isPrintSnapshot && 'pf-orbit-print', className)}
+      aria-hidden="true"
+      data-testid="skill-orbit"
+    >
+      <div className="pf-orbit-center">{centerLabel}</div>
       {tiers.map((tier, ringIndex) => {
         const iconSkills = tier.groups
           .flatMap((skillGroup) => skillGroup.names)
@@ -29,14 +40,14 @@ export function SkillOrbit({ tiers, centerLabel }: SkillOrbitProps) {
             return skillIcon ? [{ skillName, skillIcon }] : [];
           });
         return (
-          <div className={joinClassNames(styles.ring, styles[tier.id])} key={tier.id}>
+          <div className={`pf-orbit-ring pf-orbit-ring-${tier.id}`} key={tier.id}>
             {iconSkills.map(({ skillName, skillIcon }, iconIndex) => (
               <span
-                className={styles.node}
+                className="pf-orbit-node"
                 key={skillName}
                 style={placeOnRing(iconIndex, iconSkills.length, ringIndex)}
               >
-                <span className={styles.iconNode} title={skillName}>
+                <span className="pf-orbit-icon" title={isPrintSnapshot ? undefined : skillName}>
                   <SimpleIconMark icon={skillIcon} />
                 </span>
               </span>

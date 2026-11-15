@@ -25,7 +25,7 @@ export function HeroSection({ hero, profile }: HeroSectionProps) {
               alt={profile.photo.alt}
               width={profile.photo.width}
               height={profile.photo.height}
-              sizes="(min-width: 992px) 380px, 240px"
+              sizes="(min-width: 992px) 380px, 216px"
               priority
             />
           </div>

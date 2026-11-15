@@ -9,11 +9,32 @@ export const site = parseContent(
       '4+ years building web apps end to end: React and Next.js front ends, Spring Boot and GraphQL APIs, and the PostgreSQL databases behind them.',
     locale: 'en_PH',
     openGraphImageAlt:
-      'Marc Doneill Balatayo, Full-Stack Software Engineer: Building software that makes life easier for every Filipino.',
+      'Marc Doneill Balatayo, Full-Stack Software Engineer: Building software that makes everyday life easier.',
     resumePage: {
-      title: 'Resume',
-      description:
-        'The one-page resume of Marc Doneill Balatayo, a full-stack software engineer in Taguig City, PH: experience, skills and education, with a PDF download.',
+      documentTitle: 'Marc Doneill Balatayo – CV',
+      headings: { contact: 'Contact', about: 'About me' },
+    },
+    resumeReview: {
+      title: 'Resume request',
+      labels: {
+        name: 'Name',
+        email: 'Email',
+        note: 'Note',
+        country: 'Country',
+        requestedAt: 'Requested',
+        decideBy: 'Decide by',
+        status: 'Status',
+      },
+      emptyValue: 'Not given',
+      statusLabels: {
+        pending: 'Waiting for your decision',
+        approved: 'Approved. The download starts in their window.',
+        denied: 'Denied. They see a polite message.',
+        expired: 'Expired. Their window stopped waiting.',
+      },
+      approveLabel: 'Approve',
+      denyLabel: 'Deny',
+      expiredMessage: 'This request expired before you decided. Reply by email instead:',
     },
     repository: {
       label: 'Built with Next.js + Bootstrap',

@@ -1,14 +1,21 @@
 import { expect, test, type Page } from '@playwright/test';
 import {
-  contactEmail,
-  expectEmailToWrapWithRoom,
+  clickAndAwaitServerAction,
   expectNoAxeViolations,
   storeThemePreference,
+  useUniqueClientIp,
   waitForHydration,
 } from './helpers';
 import { failingDeliveryUrl } from './server-urls';
 
 const successMessage = "Thanks, your message was sent. I'll get back to you soon.";
+const failureMessage =
+  "Sorry, your message couldn't be sent. Please try again in a few minutes, or message me on LinkedIn.";
+
+// The contact form allows 5 messages per IP an hour
+test.beforeEach(async ({ page }) => {
+  await useUniqueClientIp(page);
+});
 const validMessage = {
   name: 'Jane Doe',
   email: 'jane@example.com',
@@ -46,7 +53,7 @@ async function submitServerInvalidValues(page: Page) {
   await contactForm.nameField.fill('  ');
   await contactForm.emailField.fill('jane@example');
   await contactForm.messageField.fill(' '.repeat(25));
-  await contactForm.submitButton.click();
+  await clickAndAwaitServerAction(contactForm.submitButton);
   await expect(contactForm.nameField).toHaveAttribute('aria-invalid', 'true');
 }
 
@@ -55,7 +62,7 @@ test.describe('contact form', () => {
     const contactForm = await openHydratedContactForm(page);
 
     await fillValidMessage(page);
-    await contactForm.submitButton.click();
+    await clickAndAwaitServerAction(contactForm.submitButton);
 
     await expect(contactForm.statusRegion).toHaveText(successMessage);
     await expect(contactForm.nameField).toHaveValue('');
@@ -101,7 +108,7 @@ test.describe('contact form', () => {
     await contactForm.honeypotField.evaluate((honeypotInput: HTMLInputElement) => {
       honeypotInput.value = 'https://spam.example';
     });
-    await contactForm.submitButton.click();
+    await clickAndAwaitServerAction(contactForm.submitButton);
 
     await expect(contactForm.statusRegion).toHaveText(successMessage);
     await expect(contactForm.nameField).toHaveValue('');
@@ -149,7 +156,7 @@ test.describe('contact form', () => {
       const contactForm = locateContactForm(page);
 
       await fillValidMessage(page);
-      await contactForm.submitButton.click();
+      await clickAndAwaitServerAction(contactForm.submitButton);
 
       await expect(contactForm.statusRegion).toHaveText(successMessage);
       await expect(page).toHaveURL(/\/#contact$/);
@@ -185,7 +192,7 @@ test.describe('contact form accessibility', () => {
       await expectNoAxeViolations(page);
 
       await fillValidMessage(page);
-      await contactForm.submitButton.click();
+      await clickAndAwaitServerAction(contactForm.submitButton);
       await expect(contactForm.statusRegion).toHaveText(successMessage);
       await expectNoAxeViolations(page);
     });
@@ -200,23 +207,23 @@ test.describe('contact form when delivery fails', () => {
   });
 
   for (const theme of ['dark', 'light'] as const) {
-    test(`offers the email address instead in the ${theme} theme`, async ({ page }) => {
+    test(`points to LinkedIn instead in the ${theme} theme`, async ({ page }) => {
       await storeThemePreference(page, theme);
       const contactForm = await openHydratedContactForm(page);
 
       await fillValidMessage(page);
-      await contactForm.submitButton.click();
+      await clickAndAwaitServerAction(contactForm.submitButton);
 
-      await expect(contactForm.statusRegion).toHaveText(
-        `Sorry, your message couldn't be sent. Please email me directly at ${contactEmail}.`,
-      );
+      await expect(contactForm.statusRegion).toHaveText(failureMessage);
       await expect(contactForm.nameField).toHaveValue(validMessage.name);
-      const failureLink = contactForm.statusRegion.getByRole('link', {
-        name: contactEmail,
-        exact: true,
-      });
-      await expect(failureLink).toHaveAttribute('href', `mailto:${contactEmail}`);
-      await expectEmailToWrapWithRoom(failureLink, contactForm.statusRegion.locator('p'));
+      await expect(
+        contactForm.statusRegion.getByRole('link', { name: 'LinkedIn' }),
+      ).toHaveAttribute('href', 'https://www.linkedin.com/in/marcdev06');
+      const pageWidths = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+      }));
+      expect(pageWidths.scrollWidth).toBe(pageWidths.clientWidth);
       await expectNoAxeViolations(page);
     });
   }

@@ -6,7 +6,8 @@ export const experience = parseContent(
     {
       company: 'KwikCare',
       companyUrl: 'https://kwik.care/kwikcare',
-      context: 'A health care plan (HMO) provider',
+      context:
+        'A digital insurance brokerage and subscription-based HMO (Health Maintenance Organization) provider in the Philippines',
       roles: [{ title: 'Mid-Level Full-Stack Software Engineer', start: '2025-09' }],
       bullets: [
         "Build and maintain KwikCare's health care plan (HMO) platform across the stack: Spring Boot and JHipster services, GraphQL, React/Next.js front ends and PostgreSQL.",
@@ -14,6 +15,8 @@ export const experience = parseContent(
     },
     {
       company: 'Singlife Philippines',
+      context:
+        'A mobile-first, digital life insurance and financial services company in the Philippines',
       roles: [{ title: 'Software Engineer', start: '2023-03', end: '2025-07' }],
       bullets: [
         "Built features for, maintained and improved Singlife's Policy Admin System.",

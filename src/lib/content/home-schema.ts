@@ -5,9 +5,38 @@ const sectionHeadingSchema = z.object({
   heading: requiredText('Section heading'),
 });
 
-const contactFieldCopySchema = z.object({
+const formFieldCopySchema = z.object({
   label: requiredText('Form field label'),
   error: requiredText('Form field error message'),
+});
+
+const linkedMessageSchema = z.object({
+  beforeLink: requiredText('Message text before the link'),
+  linkLabel: requiredText('Message link label'),
+  afterLink: z.string(),
+});
+
+const resumeRequestCopySchema = z.object({
+  triggerLabel: requiredText('Resume request button label'),
+  title: requiredText('Resume request dialog title'),
+  intro: requiredText('Resume request intro'),
+  closeLabel: requiredText('Close button label'),
+  fields: z.object({
+    name: formFieldCopySchema,
+    email: formFieldCopySchema,
+    note: formFieldCopySchema,
+  }),
+  honeypotLabel: requiredText('Honeypot label'),
+  privacyNote: requiredText('Privacy note'),
+  submitLabel: requiredText('Submit label'),
+  pendingLabel: requiredText('Pending label'),
+  waitingMessage: requiredText('Waiting message'),
+  approvedMessage: requiredText('Approved message'),
+  downloadLabel: requiredText('Download link label'),
+  deniedMessage: requiredText('Denied message'),
+  expiredMessage: requiredText('Expired message'),
+  rateLimitedMessage: requiredText('Rate-limited message'),
+  failureMessage: requiredText('Failure message'),
 });
 
 export const homeSchema = z.object({
@@ -38,26 +67,24 @@ export const homeSchema = z.object({
     }),
   }),
   contact: sectionHeadingSchema.extend({
-    resumeLabel: requiredText('Resume link label'),
     form: z.object({
       fields: z.object({
-        name: contactFieldCopySchema,
-        email: contactFieldCopySchema,
-        message: contactFieldCopySchema,
+        name: formFieldCopySchema,
+        email: formFieldCopySchema,
+        message: formFieldCopySchema,
       }),
       honeypotLabel: requiredText('Honeypot label'),
       submitLabel: requiredText('Submit label'),
       pendingLabel: requiredText('Pending label'),
       privacyNote: requiredText('Privacy note'),
       successMessage: requiredText('Success message'),
-      failureMessage: z.object({
-        beforeEmail: requiredText('Failure message text before the email'),
-        afterEmail: z.string(),
-      }),
+      failureMessage: linkedMessageSchema,
     }),
+    resumeRequest: resumeRequestCopySchema,
   }),
 });
 
 export type HomeContent = z.infer<typeof homeSchema>;
 export type HeroContent = HomeContent['hero'];
 export type ContactFormCopy = HomeContent['contact']['form'];
+export type ResumeRequestCopy = HomeContent['contact']['resumeRequest'];

@@ -25,7 +25,7 @@
   border-inline-start: 4px solid var(--pf-accent-text);
   border-radius: $border-radius-sm;
 
-  // Fits the email's text before the @ at 320 px
+  // Narrow phones keep status messages short
   @include media-breakpoint-down(sm) {
     padding-inline: 0.75rem;
     font-size: $font-size-sm;

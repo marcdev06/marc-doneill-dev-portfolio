@@ -14,12 +14,13 @@ export const profileSchema = z.object({
     headline: requiredText('Availability headline'),
     detail: requiredText('Availability detail'),
   }),
-  email: z.email('Email must be a valid address'),
   links: z.object({
     github: httpsUrlSchema,
     linkedin: httpsUrlSchema,
   }),
-  resumePath: sitePathSchema.regex(/\.pdf$/, 'Resume path must end in .pdf'),
+  resumeFileName: z
+    .string()
+    .regex(/^[\w-]+\.pdf$/, 'Resume file name uses letters, digits, _ or - and ends in .pdf'),
   photo: z.object({
     src: sitePathSchema,
     alt: requiredText('Photo alt text'),

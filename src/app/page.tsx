@@ -12,6 +12,7 @@ import { profile } from '@/content/profile';
 import { site } from '@/content/site';
 import { skills } from '@/content/skills';
 import { ContactForm } from '@/features/contact/contact-form';
+import { ResumeRequestTrigger } from '@/features/resume-request/resume-request-trigger';
 import { listSkillTiers } from '@/lib/content';
 import { buildProfilePageJsonLd } from '@/lib/seo';
 import { getSiteUrl } from '@/lib/site-url';
@@ -44,7 +45,13 @@ export default function HomePage() {
       <ContactSection
         contact={home.contact}
         profile={profile}
-        form={<ContactForm copy={home.contact.form} email={profile.email} />}
+        form={<ContactForm copy={home.contact.form} linkedinUrl={profile.links.linkedin} />}
+        resumeRequest={
+          <ResumeRequestTrigger
+            copy={home.contact.resumeRequest}
+            resumeFileName={profile.resumeFileName}
+          />
+        }
       />
     </>
   );

@@ -3,7 +3,7 @@
     "collect": {
       "startServerCommand": "npx next start --port 4320",
       "startServerReadyPattern": "Ready in",
-      "url": ["http://localhost:4320/", "http://localhost:4320/resume"],
+      "url": ["http://localhost:4320/"],
       "numberOfRuns": 3
     },
     "assert": {

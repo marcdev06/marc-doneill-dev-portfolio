@@ -3,27 +3,43 @@ import { describe, expect, it } from 'vitest';
 import { OpenGraphCard, splitHeadline } from './open-graph-card';
 
 const headline = {
-  beforeHighlight: 'Building software that makes life easier for ',
-  highlight: 'every Filipino',
-  afterHighlight: '.',
+  beforeHighlight: 'Building software that makes ',
+  highlight: 'everyday life',
+  afterHighlight: ' easier.',
 };
 
+const toPlainPiece = (text: string) => ({ text, isHighlighted: false });
+const toHighlightedPiece = (text: string) => ({ text, isHighlighted: true });
+
 describe('splitHeadline', () => {
-  it('marks the highlighted words and keeps the period on the last one', () => {
-    expect(splitHeadline(headline).slice(-3)).toEqual([
-      { word: 'for', isHighlighted: false, trailingText: '' },
-      { word: 'every', isHighlighted: true, trailingText: '' },
-      { word: 'Filipino', isHighlighted: true, trailingText: '.' },
+  it('marks a highlight of several words in the middle of the headline', () => {
+    expect(splitHeadline(headline)).toEqual([
+      [toPlainPiece('Building')],
+      [toPlainPiece('software')],
+      [toPlainPiece('that')],
+      [toPlainPiece('makes')],
+      [toHighlightedPiece('everyday')],
+      [toHighlightedPiece('life')],
+      [toPlainPiece('easier.')],
     ]);
   });
 
-  it('keeps words after the highlight as plain words', () => {
+  it('keeps punctuation that touches the highlight in the same word', () => {
     expect(
-      splitHeadline({ beforeHighlight: 'Building ', highlight: 'calm', afterHighlight: ' tools.' }),
+      splitHeadline({
+        beforeHighlight: 'Making life easier for ',
+        highlight: 'every Filipino',
+        afterHighlight: '.',
+      }).slice(-2),
+    ).toEqual([[toHighlightedPiece('every')], [toHighlightedPiece('Filipino'), toPlainPiece('.')]]);
+  });
+
+  it('handles a highlight inside a word and stray whitespace', () => {
+    expect(
+      splitHeadline({ beforeHighlight: '  Re', highlight: 'think', afterHighlight: 'ing  it ' }),
     ).toEqual([
-      { word: 'Building', isHighlighted: false, trailingText: '' },
-      { word: 'calm', isHighlighted: true, trailingText: '' },
-      { word: 'tools.', isHighlighted: false, trailingText: '' },
+      [toPlainPiece('Re'), toHighlightedPiece('think'), toPlainPiece('ing')],
+      [toPlainPiece('it')],
     ]);
   });
 });
@@ -52,8 +68,9 @@ describe('OpenGraphCard', () => {
     ]) {
       expect(screen.getByText(visibleText)).toBeInTheDocument();
     }
-    expect(screen.getByText('every')).toHaveStyle({ color: '#e3a76f' });
-    expect(screen.getByText('Filipino')).toHaveStyle({ color: '#e3a76f' });
+    expect(screen.getByText('everyday')).toHaveStyle({ color: '#e3a76f' });
+    expect(screen.getByText('life')).toHaveStyle({ color: '#e3a76f' });
+    expect(screen.getByText('easier.')).not.toHaveStyle({ color: '#e3a76f' });
     expect(screen.getByText('Building')).not.toHaveStyle({ color: '#e3a76f' });
   });
 });

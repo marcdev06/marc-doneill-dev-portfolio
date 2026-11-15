@@ -1,6 +1,10 @@
 'use server';
 
+import { headers } from 'next/headers';
+import { isBotSubmission } from '@/features/bot-protection/bot-verdict';
+import { createEmailSender } from '@/features/email/email-sender';
 import { readContactDeliveryConfig } from '@/lib/contact/contact-delivery-config';
+import { composeContactEmail } from '@/lib/contact/contact-email';
 import {
   contactFieldLimits,
   contactHoneypotFieldName,
@@ -8,9 +12,9 @@ import {
   type ContactFieldValues,
 } from '@/lib/contact/contact-fields';
 import { parseContactSubmission } from '@/lib/contact/contact-message-schema';
-import { isBotSubmission } from './bot-verdict';
+import { readClientIp } from '@/lib/request-store/client-ip';
 import type { ContactFormState } from './contact-form-state';
-import { createContactSender } from './contact-sender';
+import { isContactMessageAllowed } from './contact-rate-limit';
 
 function readTextField(formData: FormData, fieldName: string): string {
   const fieldValue = formData.get(fieldName);
@@ -51,12 +55,17 @@ async function deliverSubmission(
     return { status: 'invalid', invalidFields: submission.invalidFields };
   }
 
+  if (!(await isContactMessageAllowed(readClientIp(await headers())))) {
+    console.warn('[contact] A rate limit was reached; nothing was sent.');
+    return { status: 'failed', invalidFields: [] };
+  }
+
   const deliveryConfig = readContactDeliveryConfig(process.env);
   if (deliveryConfig.mode === 'unconfigured') {
     console.error(`[contact] Email delivery is not configured. ${deliveryConfig.problem}`);
     return { status: 'failed', invalidFields: [] };
   }
-  await createContactSender(deliveryConfig).sendContactMessage(submission.message);
+  await createEmailSender(deliveryConfig).sendEmail(composeContactEmail(submission.message));
   return { status: 'sent', invalidFields: [] };
 }
 

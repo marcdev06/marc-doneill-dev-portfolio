@@ -15,7 +15,11 @@ export function buildSiteInput(): z.input<typeof siteSchema> {
     description: 'Builds dependable web apps.',
     locale: 'en_GB',
     openGraphImageAlt: 'Ada Example, Engineer',
-    resumePage: { title: 'CV', description: 'The CV of Ada Example.' },
+    resumePage: {
+      documentTitle: 'Ada Example – CV',
+      headings: { contact: 'Reach me', about: 'Profile' },
+    },
+    resumeReview: buildResumeReviewCopyInput(),
     repository: { label: 'Source', href: 'https://example.com/source' },
     navigationLinks: [{ label: 'Experience', href: '/#experience' }],
   };
@@ -30,9 +34,8 @@ export function buildProfileInput(): z.input<typeof profileSchema> {
     location: 'Example City, GB',
     timeZoneLabel: 'Example time (UTC+0)',
     availability: { headline: 'Open to contracts', detail: 'Open to contract work.' },
-    email: 'ada@example.com',
     links: { github: 'https://github.com/ada', linkedin: 'https://www.linkedin.com/in/ada' },
-    resumePath: '/resume.pdf',
+    resumeFileName: 'Ada_Example_CV.pdf',
     photo: { src: '/images/ada.jpg', alt: 'Portrait of Ada', width: 400, height: 400 },
   };
 }
@@ -58,8 +61,8 @@ export function buildHomeInput(): z.input<typeof homeSchema> {
     },
     contact: {
       heading: "Let's talk",
-      resumeLabel: 'Download resume',
       form: buildContactFormCopyInput(),
+      resumeRequest: buildResumeRequestCopyInput(),
     },
   };
 }
@@ -76,7 +79,59 @@ export function buildContactFormCopyInput(): z.input<typeof homeSchema>['contact
     pendingLabel: 'Sending now',
     privacyNote: "This site doesn't store it.",
     successMessage: 'Sent, thanks.',
-    failureMessage: { beforeEmail: 'Not sent. Write to ', afterEmail: ' instead.' },
+    failureMessage: { beforeLink: 'Not sent. Try ', linkLabel: 'LinkedIn', afterLink: ' instead.' },
+  };
+}
+
+export function buildResumeRequestCopyInput(): z.input<
+  typeof homeSchema
+>['contact']['resumeRequest'] {
+  return {
+    triggerLabel: 'Ask for my CV',
+    title: 'Ask for my CV',
+    intro: 'Tell me who you are.',
+    closeLabel: 'Dismiss',
+    fields: {
+      name: { label: 'Your name', error: 'Name error.' },
+      email: { label: 'Your email', error: 'Email error.' },
+      note: { label: 'Why?', error: 'Note error.' },
+    },
+    honeypotLabel: 'Website',
+    privacyNote: 'Deleted after a day.',
+    submitLabel: 'Ask',
+    pendingLabel: 'Asking',
+    waitingMessage: 'Waiting for Ada.',
+    approvedMessage: 'Approved.',
+    downloadLabel: 'Get the PDF',
+    deniedMessage: 'Denied.',
+    expiredMessage: 'Expired.',
+    rateLimitedMessage: 'Too many requests.',
+    failureMessage: 'Not sent.',
+  };
+}
+
+export function buildResumeReviewCopyInput(): z.input<typeof siteSchema>['resumeReview'] {
+  return {
+    title: 'CV request',
+    labels: {
+      name: 'Name',
+      email: 'Email',
+      note: 'Note',
+      country: 'Country',
+      requestedAt: 'Requested',
+      decideBy: 'Decide by',
+      status: 'Status',
+    },
+    emptyValue: 'None',
+    statusLabels: {
+      pending: 'Pending',
+      approved: 'Approved',
+      denied: 'Denied',
+      expired: 'Expired',
+    },
+    approveLabel: 'Approve',
+    denyLabel: 'Deny',
+    expiredMessage: 'Expired. Email them:',
   };
 }
 

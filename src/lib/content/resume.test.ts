@@ -4,6 +4,7 @@ import {
   buildExperienceInput,
   buildHomeInput,
   buildProfileInput,
+  buildSiteInput,
   buildSkillsInput,
 } from '../../../test/content-fixtures';
 import { computeContentHash } from './content-hash';
@@ -12,25 +13,28 @@ import { experienceSchema } from './experience-schema';
 import { homeSchema } from './home-schema';
 import { profileSchema } from './profile-schema';
 import { composeResume, computeResumeContentHash, formatDisplayUrl } from './resume';
+import { siteSchema } from './site-schema';
 import { skillsSchema } from './skills-schema';
 
 function buildResumeSources() {
   return {
     profile: profileSchema.parse(buildProfileInput()),
+    about: 'Builds dependable web apps.',
     experience: experienceSchema.parse(buildExperienceInput()),
     skills: skillsSchema.parse(buildSkillsInput()),
     education: educationSchema.parse(buildEducationInput()),
     sectionCopy: homeSchema.parse(buildHomeInput()),
+    resumeCopy: siteSchema.parse(buildSiteInput()).resumePage,
   };
 }
 
 describe('composeResume', () => {
-  it('keeps only what the resume shows, with no phone or street address', () => {
+  it('keeps only what the resume shows, with no email, phone or street address', () => {
     const resume = composeResume(buildResumeSources());
 
     expect(Object.keys(resume).sort()).toEqual([
+      'about',
       'education',
-      'email',
       'experience',
       'headings',
       'links',
@@ -39,15 +43,19 @@ describe('composeResume', () => {
       'skills',
       'title',
     ]);
+    expect(resume.about).toBe('Builds dependable web apps.');
     expect(resume.links).toEqual({
       github: 'https://github.com/ada',
       linkedin: 'https://www.linkedin.com/in/ada',
     });
     expect(resume.headings).toEqual({
+      contact: 'Reach me',
+      about: 'Profile',
       experience: 'Experience',
       skills: 'Skills',
       education: 'Education',
     });
+    expect(JSON.stringify(resume)).not.toContain('@');
   });
 });
 

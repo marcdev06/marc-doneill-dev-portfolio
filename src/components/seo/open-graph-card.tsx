@@ -9,11 +9,12 @@ interface OpenGraphCardProps {
   photoAlt: string;
 }
 
-interface HeadlineWord {
-  word: string;
+export interface HeadlinePiece {
+  text: string;
   isHighlighted: boolean;
-  trailingText: string;
 }
+
+export type HeadlineWord = HeadlinePiece[];
 
 const openGraphColors = {
   canvas: '#0f1714',
@@ -29,22 +30,26 @@ const openGraphColors = {
 const photoSizePixels = 300;
 const photoRingPixels = 6;
 
-function toWords(text: string, isHighlighted: boolean, trailingText = ''): HeadlineWord[] {
-  const words = text.split(/\s+/).filter(Boolean);
-  return words.map((word, wordIndex) => ({
-    word,
-    isHighlighted,
-    trailingText: wordIndex === words.length - 1 ? trailingText : '',
-  }));
-}
-
+// Whitespace splits words; text touching a word joins it
 export function splitHeadline(headline: HeroContent['headline']): HeadlineWord[] {
-  const [attachedText = '', ...afterWords] = headline.afterHighlight.split(/\s+/);
-  return [
-    ...toWords(headline.beforeHighlight, false),
-    ...toWords(headline.highlight, true, attachedText),
-    ...toWords(afterWords.join(' '), false),
+  const segments = [
+    { text: headline.beforeHighlight, isHighlighted: false },
+    { text: headline.highlight, isHighlighted: true },
+    { text: headline.afterHighlight, isHighlighted: false },
   ];
+  const words: HeadlineWord[] = [];
+  let currentWord: HeadlineWord = [];
+  for (const segment of segments) {
+    for (const token of segment.text.split(/(\s+)/)) {
+      if (/^\s+$/.test(token) && currentWord.length > 0) {
+        words.push(currentWord);
+        currentWord = [];
+      } else if (/\S/.test(token)) {
+        currentWord.push({ text: token, isHighlighted: segment.isHighlighted });
+      }
+    }
+  }
+  return currentWord.length > 0 ? [...words, currentWord] : words;
 }
 
 // Satori needs inline styles and one flex item per word
@@ -118,13 +123,15 @@ export function OpenGraphCard({
           }}
         >
           {splitHeadline(headline).map((headlineWord, wordIndex) => (
-            <span key={`${headlineWord.word}-${String(wordIndex)}`} style={{ display: 'flex' }}>
-              <span
-                style={{ color: headlineWord.isHighlighted ? openGraphColors.warm : undefined }}
-              >
-                {headlineWord.word}
-              </span>
-              {headlineWord.trailingText}
+            <span key={String(wordIndex)} style={{ display: 'flex' }}>
+              {headlineWord.map((headlinePiece, pieceIndex) => (
+                <span
+                  key={String(pieceIndex)}
+                  style={{ color: headlinePiece.isHighlighted ? openGraphColors.warm : undefined }}
+                >
+                  {headlinePiece.text}
+                </span>
+              ))}
             </span>
           ))}
         </div>

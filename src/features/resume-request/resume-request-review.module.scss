@@ -1,0 +1,46 @@
+@import '../../styles/module-helpers';
+
+.panel {
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.heading {
+  margin-bottom: 1.5rem;
+  font-size: $h3-font-size * 1.4;
+}
+
+.details {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.detail {
+  display: grid;
+  gap: 0 1rem;
+
+  @include media-breakpoint-up(sm) {
+    grid-template-columns: 8rem 1fr;
+  }
+
+  dt {
+    font-weight: $font-weight-semibold;
+    color: var(--#{$prefix}secondary-color);
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+  }
+}
+
+.expired {
+  margin: 0;
+}
+
+.email {
+  overflow-wrap: anywhere;
+  user-select: all;
+}
