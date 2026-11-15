@@ -17,6 +17,7 @@
   --pf-border-strong: #{$pf-border-strong};
   --pf-ring: #{$pf-ring};
   --pf-ring-soft: #{$pf-ring-soft};
+  --pf-input-border: #{$pf-input-border};
 }
 
 @include color-mode(dark, true) {
@@ -33,4 +34,5 @@
   --pf-border-strong: #{$pf-border-strong-dark};
   --pf-ring: #{$pf-ring-dark};
   --pf-ring-soft: #{$pf-ring-soft-dark};
+  --pf-input-border: #{$pf-input-border-dark};
 }

@@ -9,10 +9,88 @@ export async function expectNoAxeViolations(page: Page) {
   expect(axeResults.violations).toEqual([]);
 }
 
+export async function waitForHydration(page: Page, selector: string) {
+  await page.waitForFunction((hydratedSelector) => {
+    const element = document.querySelector(hydratedSelector);
+    return element !== null && Object.keys(element).some((key) => key.startsWith('__reactFiber'));
+  }, selector);
+}
+
 export async function storeThemePreference(page: Page, theme: 'light' | 'dark') {
   await page.addInitScript((storedTheme) => {
     window.localStorage.setItem('theme', storedTheme);
   }, theme);
+}
+
+export async function readRenderedLines(textLocator: Locator): Promise<string[]> {
+  await textLocator.page().evaluate(async () => {
+    await document.fonts.ready;
+  });
+  return textLocator.evaluate((element) => {
+    const textByLineTop = new Map<number, string>();
+    const textWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    for (let textNode = textWalker.nextNode(); textNode; textNode = textWalker.nextNode()) {
+      const nodeText = textNode.textContent ?? '';
+      for (let charIndex = 0; charIndex < nodeText.length; charIndex += 1) {
+        const charRange = document.createRange();
+        charRange.setStart(textNode, charIndex);
+        charRange.setEnd(textNode, charIndex + 1);
+        const lineTop = Math.round(charRange.getBoundingClientRect().top);
+        textByLineTop.set(lineTop, (textByLineTop.get(lineTop) ?? '') + nodeText.charAt(charIndex));
+      }
+    }
+    return [...textByLineTop.values()];
+  });
+}
+
+export async function readTextNodeWidth(textLocator: Locator, text: string): Promise<number> {
+  await textLocator.page().evaluate(async () => {
+    await document.fonts.ready;
+  });
+  return textLocator.evaluate((element, wantedText) => {
+    const textWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    for (let textNode = textWalker.nextNode(); textNode; textNode = textWalker.nextNode()) {
+      if (textNode.textContent === wantedText) {
+        const textRange = document.createRange();
+        textRange.selectNodeContents(textNode);
+        return textRange.getBoundingClientRect().width;
+      }
+    }
+    throw new Error(`No text node reads "${wantedText}"`);
+  }, text);
+}
+
+export async function readContentWidth(boxLocator: Locator): Promise<number> {
+  return boxLocator.evaluate((element) => {
+    const boxStyle = getComputedStyle(element);
+    return (
+      element.clientWidth - parseFloat(boxStyle.paddingLeft) - parseFloat(boxStyle.paddingRight)
+    );
+  });
+}
+
+export async function expectTextToFitWithRoom(
+  textLocator: Locator,
+  text: string,
+  boxLocator: Locator,
+) {
+  const textWidth = await readTextNodeWidth(textLocator, text);
+  const availableWidth = await readContentWidth(boxLocator);
+  // At most 90%, so wider font rendering still fits
+  expect(
+    textWidth,
+    `"${text}" is ${textWidth.toFixed(1)} of ${availableWidth.toFixed(1)} px`,
+  ).toBeLessThanOrEqual(availableWidth * 0.9);
+}
+
+export const contactEmail = 'balatayo.marcdoneill@gmail.com';
+const contactEmailBeforeBreak = 'balatayo.marcdoneill@';
+
+export async function expectEmailToWrapWithRoom(emailLink: Locator, boxLocator: Locator) {
+  expect([[contactEmail], [contactEmailBeforeBreak, 'gmail.com']]).toContainEqual(
+    await readRenderedLines(emailLink),
+  );
+  await expectTextToFitWithRoom(emailLink, contactEmailBeforeBreak, boxLocator);
 }
 
 export async function expectHeadingBelowHeader(heading: Locator) {

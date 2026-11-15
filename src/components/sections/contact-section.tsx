@@ -1,14 +1,17 @@
+import type { ReactNode } from 'react';
 import type { HomeContent, Profile } from '@/lib/content';
 import { DownloadIcon, EnvelopeIcon, GithubIcon, LinkedinIcon } from '../ui/icons';
+import { EmailAddress } from '../ui/email-address';
 import { joinClassNames } from '../ui/join-class-names';
 import styles from './contact-section.module.scss';
 
 interface ContactSectionProps {
   contact: HomeContent['contact'];
   profile: Profile;
+  form?: ReactNode;
 }
 
-export function ContactSection({ contact, profile }: ContactSectionProps) {
+export function ContactSection({ contact, profile, form }: ContactSectionProps) {
   return (
     <section id="contact" className="py-6 py-lg-7" aria-labelledby="contact-heading">
       <div className="container">
@@ -18,9 +21,10 @@ export function ContactSection({ contact, profile }: ContactSectionProps) {
               {contact.heading}
             </h2>
             <p className="lead text-body-secondary mb-4">{profile.availability.detail}</p>
+            {form && <div className={styles.formSlot}>{form}</div>}
             <a className={styles.email} href={`mailto:${profile.email}`}>
               <EnvelopeIcon className={styles.emailIcon} />
-              {profile.email}
+              <EmailAddress address={profile.email} />
             </a>
             <div className="d-flex flex-wrap justify-content-center align-items-center gap-3 mt-4">
               <a

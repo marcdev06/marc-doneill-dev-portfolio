@@ -42,6 +42,31 @@ export const home = parseContent(
     contact: {
       heading: "Let's build something",
       resumeLabel: 'Download resume',
+      form: {
+        fields: {
+          name: {
+            label: 'Name',
+            error: 'Please enter your name (2 to 100 characters).',
+          },
+          email: {
+            label: 'Email',
+            error: 'Please enter a valid email address, like name@example.com.',
+          },
+          message: {
+            label: 'Message',
+            error: 'Please write a message of 20 to 5,000 characters.',
+          },
+        },
+        honeypotLabel: 'Company website',
+        submitLabel: 'Send message',
+        pendingLabel: 'Sending…',
+        privacyNote: "Your message goes straight to my inbox; this site doesn't store it.",
+        successMessage: "Thanks, your message was sent. I'll get back to you soon.",
+        failureMessage: {
+          beforeEmail: "Sorry, your message couldn't be sent. Please email me directly at ",
+          afterEmail: '.',
+        },
+      },
     },
   },
   'src/content/home.ts',

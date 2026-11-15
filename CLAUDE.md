@@ -26,7 +26,7 @@ npm run format:check    # prettier --check .
 npm run test            # vitest run
 npm run test:watch      # vitest in watch mode
 npm run coverage        # vitest with coverage thresholds
-npm run e2e             # builds, serves on port 4318, runs Playwright + axe
+npm run e2e             # builds, serves on 4318 (log) and 4319 (delivery off), runs Playwright + axe
 npm run resume:pdf      # builds, renders /resume to public/resume.pdf + resume.meta.json
 ```
 
@@ -65,7 +65,7 @@ ESLint enforces these rules with `no-restricted-imports`:
 - `src/components/**` must not import `@/features` or `@/app`.
 - `src/content/**` (tests excepted) may import only `@/lib/content`.
 
-Client components must import from `@/lib/content` with `import type` only, so zod stays out of the browser bundle.
+Client components must import from `@/lib/content` with `import type` only, so zod stays out of the browser bundle. From `src/lib/contact`, client code may import only `contact-fields.ts`; the zod schema stays in the Server Action.
 
 Coverage thresholds (Vitest): `src/lib/**` 100%, `src/components/**` and `src/features/**` 90%.
 
@@ -77,6 +77,7 @@ Coverage thresholds (Vitest): `src/lib/**` 100%, `src/components/**` and `src/fe
 - Dark is the default theme (`next-themes`, `data-bs-theme` on `<html>`). Motion is CSS-only and switched off under `prefers-reduced-motion`.
 - No Tailwind. Every page is statically prerendered; don't enable experimental Next flags.
 - `metadataBase` comes from `getSiteUrl()` in `src/lib/site-url.ts`.
+- Contact form: never send real email from local runs, tests or CI. Use `CONTACT_DELIVERY=log` (Playwright's `webServer` sets it) and mock `resend` in unit tests. BotID verifies only on Vercel (`VERCEL=1` on the server, `NEXT_PUBLIC_VERCEL_ENV` on the client); elsewhere it answers human.
 
 ## Git workflow
 

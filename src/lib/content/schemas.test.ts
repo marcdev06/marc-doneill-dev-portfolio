@@ -90,6 +90,22 @@ describe('homeSchema', () => {
     expect(listIssues(homeSchema, homeInput)).toEqual([]);
   });
 
+  it('requires every piece of contact form copy', () => {
+    const homeInput = buildHomeInput();
+    homeInput.contact.form.fields.email.label = ' ';
+    homeInput.contact.form.successMessage = '';
+    homeInput.contact.form.failureMessage.beforeEmail = '';
+
+    expect(listIssues(homeSchema, homeInput)).toEqual([
+      { path: 'contact.form.fields.email.label', message: 'Form field label is required' },
+      { path: 'contact.form.successMessage', message: 'Success message is required' },
+      {
+        path: 'contact.form.failureMessage.beforeEmail',
+        message: 'Failure message text before the email is required',
+      },
+    ]);
+  });
+
   it('rejects unsafe links, empty evidence and missing phrases', () => {
     const homeInput = buildHomeInput();
     homeInput.hero.primaryAction.href = 'javascript:alert(1)';

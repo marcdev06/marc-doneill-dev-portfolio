@@ -5,6 +5,11 @@ const sectionHeadingSchema = z.object({
   heading: requiredText('Section heading'),
 });
 
+const contactFieldCopySchema = z.object({
+  label: requiredText('Form field label'),
+  error: requiredText('Form field error message'),
+});
+
 export const homeSchema = z.object({
   hero: z.object({
     greeting: requiredText('Hero greeting'),
@@ -34,8 +39,25 @@ export const homeSchema = z.object({
   }),
   contact: sectionHeadingSchema.extend({
     resumeLabel: requiredText('Resume link label'),
+    form: z.object({
+      fields: z.object({
+        name: contactFieldCopySchema,
+        email: contactFieldCopySchema,
+        message: contactFieldCopySchema,
+      }),
+      honeypotLabel: requiredText('Honeypot label'),
+      submitLabel: requiredText('Submit label'),
+      pendingLabel: requiredText('Pending label'),
+      privacyNote: requiredText('Privacy note'),
+      successMessage: requiredText('Success message'),
+      failureMessage: z.object({
+        beforeEmail: requiredText('Failure message text before the email'),
+        afterEmail: z.string(),
+      }),
+    }),
   }),
 });
 
 export type HomeContent = z.infer<typeof homeSchema>;
 export type HeroContent = HomeContent['hero'];
+export type ContactFormCopy = HomeContent['contact']['form'];

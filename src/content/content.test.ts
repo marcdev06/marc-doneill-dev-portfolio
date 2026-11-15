@@ -93,6 +93,29 @@ describe('site content', () => {
     });
   });
 
+  it('uses the brief copy for the contact form, with the email from the profile', () => {
+    const formCopy = home.contact.form;
+
+    expect(
+      [formCopy.fields.name, formCopy.fields.email, formCopy.fields.message].map(
+        (fieldCopy) => fieldCopy.label,
+      ),
+    ).toEqual(['Name', 'Email', 'Message']);
+    expect(formCopy.submitLabel).toBe('Send message');
+    expect(formCopy.privacyNote).toBe(
+      "Your message goes straight to my inbox; this site doesn't store it.",
+    );
+    expect(formCopy.successMessage).toBe(
+      "Thanks, your message was sent. I'll get back to you soon.",
+    );
+    expect(
+      `${formCopy.failureMessage.beforeEmail}${profile.email}${formCopy.failureMessage.afterEmail}`,
+    ).toBe(
+      "Sorry, your message couldn't be sent. Please email me directly at balatayo.marcdoneill@gmail.com.",
+    );
+    expect(JSON.stringify(formCopy)).not.toContain(profile.email);
+  });
+
   it('lists only the bachelor degree', () => {
     expect(education).toHaveLength(1);
     expect(education[0]?.degree).toBe('Bachelor of Science in Information Technology');
