@@ -43,6 +43,56 @@ export async function readRenderedLines(textLocator: Locator): Promise<string[]>
   });
 }
 
+export async function readTextNodeWidth(textLocator: Locator, text: string): Promise<number> {
+  await textLocator.page().evaluate(async () => {
+    await document.fonts.ready;
+  });
+  return textLocator.evaluate((element, wantedText) => {
+    const textWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    for (let textNode = textWalker.nextNode(); textNode; textNode = textWalker.nextNode()) {
+      if (textNode.textContent === wantedText) {
+        const textRange = document.createRange();
+        textRange.selectNodeContents(textNode);
+        return textRange.getBoundingClientRect().width;
+      }
+    }
+    throw new Error(`No text node reads "${wantedText}"`);
+  }, text);
+}
+
+export async function readContentWidth(boxLocator: Locator): Promise<number> {
+  return boxLocator.evaluate((element) => {
+    const boxStyle = getComputedStyle(element);
+    return (
+      element.clientWidth - parseFloat(boxStyle.paddingLeft) - parseFloat(boxStyle.paddingRight)
+    );
+  });
+}
+
+export async function expectTextToFitWithRoom(
+  textLocator: Locator,
+  text: string,
+  boxLocator: Locator,
+) {
+  const textWidth = await readTextNodeWidth(textLocator, text);
+  const availableWidth = await readContentWidth(boxLocator);
+  // At most 90%, so wider font rendering still fits
+  expect(
+    textWidth,
+    `"${text}" is ${textWidth.toFixed(1)} of ${availableWidth.toFixed(1)} px`,
+  ).toBeLessThanOrEqual(availableWidth * 0.9);
+}
+
+export const contactEmail = 'balatayo.marcdoneill@gmail.com';
+const contactEmailBeforeBreak = 'balatayo.marcdoneill@';
+
+export async function expectEmailToWrapWithRoom(emailLink: Locator, boxLocator: Locator) {
+  expect([[contactEmail], [contactEmailBeforeBreak, 'gmail.com']]).toContainEqual(
+    await readRenderedLines(emailLink),
+  );
+  await expectTextToFitWithRoom(emailLink, contactEmailBeforeBreak, boxLocator);
+}
+
 export async function expectHeadingBelowHeader(heading: Locator) {
   await expect(heading).toBeInViewport();
   await expect

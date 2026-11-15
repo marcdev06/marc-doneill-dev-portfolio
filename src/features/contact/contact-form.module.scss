@@ -27,6 +27,7 @@
 
   // Fits the email's text before the @ at 320 px
   @include media-breakpoint-down(sm) {
+    padding-inline: 0.75rem;
     font-size: $font-size-sm;
   }
 }

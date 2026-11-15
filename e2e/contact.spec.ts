@@ -1,5 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
-import { expectNoAxeViolations, storeThemePreference, waitForHydration } from './helpers';
+import {
+  contactEmail,
+  expectEmailToWrapWithRoom,
+  expectNoAxeViolations,
+  storeThemePreference,
+  waitForHydration,
+} from './helpers';
+import { failingDeliveryUrl } from './server-urls';
 
 const successMessage = "Thanks, your message was sent. I'll get back to you soon.";
 const validMessage = {
@@ -180,6 +187,36 @@ test.describe('contact form accessibility', () => {
       await fillValidMessage(page);
       await contactForm.submitButton.click();
       await expect(contactForm.statusRegion).toHaveText(successMessage);
+      await expectNoAxeViolations(page);
+    });
+  }
+});
+
+test.describe('contact form when delivery fails', () => {
+  test.use({
+    baseURL: failingDeliveryUrl,
+    viewport: { width: 320, height: 812 },
+    contextOptions: { reducedMotion: 'reduce' },
+  });
+
+  for (const theme of ['dark', 'light'] as const) {
+    test(`offers the email address instead in the ${theme} theme`, async ({ page }) => {
+      await storeThemePreference(page, theme);
+      const contactForm = await openHydratedContactForm(page);
+
+      await fillValidMessage(page);
+      await contactForm.submitButton.click();
+
+      await expect(contactForm.statusRegion).toHaveText(
+        `Sorry, your message couldn't be sent. Please email me directly at ${contactEmail}.`,
+      );
+      await expect(contactForm.nameField).toHaveValue(validMessage.name);
+      const failureLink = contactForm.statusRegion.getByRole('link', {
+        name: contactEmail,
+        exact: true,
+      });
+      await expect(failureLink).toHaveAttribute('href', `mailto:${contactEmail}`);
+      await expectEmailToWrapWithRoom(failureLink, contactForm.statusRegion.locator('p'));
       await expectNoAxeViolations(page);
     });
   }

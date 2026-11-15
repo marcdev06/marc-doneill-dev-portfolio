@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectHeadingBelowHeader, readRenderedLines } from './helpers';
+import { contactEmail, expectEmailToWrapWithRoom, expectHeadingBelowHeader } from './helpers';
 
 const sectionHeadings = [
   { linkName: 'Experience', headingName: 'Experience' },
@@ -75,18 +75,13 @@ for (const phoneWidth of [375, 320]) {
       expect(pageWidths.scrollWidth).toBe(pageWidths.clientWidth);
     });
 
-    test('wraps the contact email only after the @', async ({ page }) => {
+    test('wraps the contact email only after the @, with room to spare', async ({ page }) => {
       await page.goto('/');
 
-      const emailLink = page.getByRole('link', {
-        name: 'balatayo.marcdoneill@gmail.com',
-        exact: true,
-      });
-      await expect(emailLink).toHaveAttribute('href', 'mailto:balatayo.marcdoneill@gmail.com');
-      expect([
-        ['balatayo.marcdoneill@gmail.com'],
-        ['balatayo.marcdoneill@', 'gmail.com'],
-      ]).toContainEqual(await readRenderedLines(emailLink));
+      const emailLink = page.getByRole('link', { name: contactEmail, exact: true });
+      await expect(emailLink).toHaveAttribute('href', `mailto:${contactEmail}`);
+      // The address span is the flex item, so it shows the real room
+      await expectEmailToWrapWithRoom(emailLink, emailLink.locator('span'));
     });
   });
 }

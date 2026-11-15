@@ -1,7 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
+import { failingDeliveryPort, failingDeliveryUrl, sitePort, siteUrl } from './e2e/server-urls';
 
-const port = 4318;
-const baseUrl = `http://localhost:${String(port)}`;
 const isCi = Boolean(process.env.CI);
 
 export default defineConfig({
@@ -13,7 +12,7 @@ export default defineConfig({
     ? [['github'], ['html', { open: 'never' }]]
     : [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: baseUrl,
+    baseURL: siteUrl,
     trace: 'retain-on-failure',
   },
   projects: [
@@ -26,12 +25,22 @@ export default defineConfig({
       use: { ...devices['Pixel 5'] },
     },
   ],
-  webServer: {
-    command: `npx next build && npx next start --port ${String(port)}`,
-    // Never email from tests; the action logs messages instead
-    env: { CONTACT_DELIVERY: 'log' },
-    url: baseUrl,
-    reuseExistingServer: false,
-    timeout: 180_000,
-  },
+  webServer: [
+    {
+      command: `npx next build && npx next start --port ${String(sitePort)}`,
+      // Never email from tests; the action logs messages instead
+      env: { CONTACT_DELIVERY: 'log' },
+      url: siteUrl,
+      reuseExistingServer: false,
+      timeout: 180_000,
+    },
+    {
+      // Starts after the build above; unknown modes fail every send
+      command: `npx next start --port ${String(failingDeliveryPort)}`,
+      env: { CONTACT_DELIVERY: 'disabled' },
+      url: failingDeliveryUrl,
+      reuseExistingServer: false,
+      timeout: 60_000,
+    },
+  ],
 });

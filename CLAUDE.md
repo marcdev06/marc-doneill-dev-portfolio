@@ -26,7 +26,7 @@ npm run format:check    # prettier --check .
 npm run test            # vitest run
 npm run test:watch      # vitest in watch mode
 npm run coverage        # vitest with coverage thresholds
-npm run e2e             # builds, serves on port 4318, runs Playwright + axe
+npm run e2e             # builds, serves on 4318 (log) and 4319 (delivery off), runs Playwright + axe
 npm run resume:pdf      # builds, renders /resume to public/resume.pdf + resume.meta.json
 ```
 
