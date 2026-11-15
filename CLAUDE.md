@@ -27,8 +27,11 @@ npm run test            # vitest run
 npm run test:watch      # vitest in watch mode
 npm run coverage        # vitest with coverage thresholds
 npm run e2e             # builds, serves on 4318 (log) and 4319 (delivery off), runs Playwright + axe
+npm run lighthouse      # Lighthouse CI on 4320 (/ and /resume, mobile, median of 3); needs a prior build
 npm run resume:pdf      # builds, renders /resume to public/resume.pdf + resume.meta.json
 ```
+
+Lighthouse CI asserts at least 0.95 in all four categories and writes reports to the git-ignored `.lighthouseci/`. It needs a local Chrome.
 
 After changing anything the resume shows (profile, experience, skills, education or their headings), run `npm run resume:pdf` and stage both generated files. A Vitest staleness test fails until you do.
 
@@ -42,7 +45,7 @@ npx playwright test <file> --project=desktop
 Full check before handing work back:
 
 ```bash
-npm ci && npm run format:check && npm run lint && npm run typecheck && npm run coverage && npm run build && npm run e2e
+npm ci && npm run format:check && npm run lint && npm run typecheck && npm run coverage && npm run build && npm run e2e && npm run lighthouse
 ```
 
 First e2e run on a new machine: `npx playwright install chromium`.
@@ -52,9 +55,11 @@ First e2e run on a new machine: `npx playwright install chromium`.
 - `src/app/`: routes. Keep them thin; they only compose components.
 - `src/components/`: shared UI (`ui/`, `sections/`, `mdx/` as they arrive). Server Components by default.
 - `src/features/`: self-contained features such as `contact/`.
-- `src/lib/`: pure TypeScript (site URL, content schemas and loaders). No React, no Next.
+- `src/lib/`: pure TypeScript (site URL, content schemas and loaders, SEO builders in `seo/`). No React, no Next.
 - `src/content/`: site content, validated by schemas in `src/lib/content`.
 - `src/styles/`: `_theme.scss` (Bootstrap variable overrides, light and dark), `_tokens.scss` (`--pf-*` custom properties per theme), `_site.scss` (site-wide classes and motion) and `main.scss` (only the Bootstrap partials in use). CSS Modules import `_module-helpers.scss` for Bootstrap variables and mixins.
+- `assets/`: build-time files that are not served, such as the Poppins TTFs (with `OFL.txt`) for the Open Graph image.
+- `docs/`: the README screenshot.
 - `scripts/`: Node scripts run with Node's built-in TypeScript support.
 - `test/`: shared test helpers and content fixtures.
 - `e2e/`: Playwright specs.
@@ -76,8 +81,13 @@ Coverage thresholds (Vitest): `src/lib/**` 100%, `src/components/**` and `src/fe
 - Dark-mode Sass variables (`$body-bg-dark` and friends) live in `_theme.scss`: Bootstrap's `_variables.scss` imports `variables-dark` itself.
 - Dark is the default theme (`next-themes`, `data-bs-theme` on `<html>`). Motion is CSS-only and switched off under `prefers-reduced-motion`.
 - No Tailwind. Every page is statically prerendered; don't enable experimental Next flags.
-- `metadataBase` comes from `getSiteUrl()` in `src/lib/site-url.ts`.
-- Contact form: never send real email from local runs, tests or CI. Use `CONTACT_DELIVERY=log` (Playwright's `webServer` sets it) and mock `resend` in unit tests. BotID verifies only on Vercel (`VERCEL=1` on the server, `NEXT_PUBLIC_VERCEL_ENV` on the client); elsewhere it answers human.
+- `metadataBase` comes from `getSiteUrl()` in `src/lib/site-url.ts`. Every URL in `<head>` must be absolute; e2e checks it.
+- SEO files: `src/app/opengraph-image.tsx` (static, reads fonts and the photo with `fs`), `robots.ts`, `sitemap.ts` and the JSON-LD in `page.tsx`. Their logic lives in `src/lib/seo/` (100% covered). SEO copy lives in `src/content/site.ts`. A page that sets `openGraph` must use `buildOpenGraph()`, or it loses the shared image. New indexable routes go in `indexedPagePaths`.
+- `robots.txt` disallows crawling only when `VERCEL_ENV` is set and isn't `production`, so Lighthouse's crawlability audit passes locally and in CI.
+- Analytics: `<VercelAnalytics />` renders `@vercel/analytics` only when `NEXT_PUBLIC_VERCEL_ENV` is set, so local, CI and Lighthouse runs never request `/_vercel/insights/*`. No Speed Insights and no custom events.
+- Security headers live in `next.config.ts`. Don't add `script-src`: nonces would make pages dynamic.
+- Bundle budget for `/`: at most 160 kB gzip JS and 25 kB gzip CSS, measured on a build with `NEXT_PUBLIC_VERCEL_ENV=preview`. BotID's client is lazy-loaded from the contact form to stay inside it.
+- Contact form: never send real email from local runs, tests or CI. Use `CONTACT_DELIVERY=log` (Playwright's `webServer` sets it) and mock `resend` in unit tests. BotID verifies only on Vercel (`VERCEL=1` on the server, `NEXT_PUBLIC_VERCEL_ENV` on the client); elsewhere it answers human. Its client starts from `useLazyBotProtection` when the form nears the viewport or gets focus; a submit before that fails closed with the email fallback.
 
 ## Git workflow
 

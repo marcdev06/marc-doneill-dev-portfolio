@@ -50,6 +50,19 @@ describe('siteSchema', () => {
       { path: 'navigationLinks', message: 'Add at least one navigation link' },
     ]);
   });
+
+  it('requires an Open Graph locale, image alt text and resume page copy', () => {
+    const siteInput = buildSiteInput();
+    siteInput.locale = 'en-PH';
+    siteInput.openGraphImageAlt = ' ';
+    siteInput.resumePage = { title: 'Resume', description: '' };
+
+    expect(listIssues(siteSchema, siteInput)).toEqual([
+      { path: 'locale', message: 'Locale reads like en_PH' },
+      { path: 'openGraphImageAlt', message: 'Open Graph image alt text is required' },
+      { path: 'resumePage.description', message: 'Resume page description is required' },
+    ]);
+  });
 });
 
 describe('profileSchema', () => {
@@ -75,6 +88,18 @@ describe('profileSchema', () => {
       { path: 'resumePath', message: 'Resume path must end in .pdf' },
     ]);
   });
+
+  it.each(['Taguig City', 'Taguig City, Philippines', ', PH'])(
+    'rejects the location "%s", which structured data cannot split',
+    (location) => {
+      expect(listIssues(profileSchema, { ...buildProfileInput(), location })).toEqual([
+        {
+          path: 'location',
+          message: 'Location reads "City, CC" with a two-letter country code',
+        },
+      ]);
+    },
+  );
 });
 
 describe('homeSchema', () => {

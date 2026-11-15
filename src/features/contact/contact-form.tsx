@@ -12,6 +12,7 @@ import type { ContactFormCopy } from '@/lib/content';
 import { initialContactFormState, type ContactFormState } from './contact-form-state';
 import styles from './contact-form.module.scss';
 import { submitContactMessage } from './submit-contact-message';
+import { useLazyBotProtection } from './use-lazy-bot-protection';
 
 interface ContactFormProps {
   copy: ContactFormCopy;
@@ -66,6 +67,7 @@ export function ContactForm({ copy, email }: ContactFormProps) {
     '/#contact',
   );
   const formRef = useRef<HTMLFormElement>(null);
+  useLazyBotProtection(formRef);
 
   useEffect(() => {
     const [firstInvalidField] = formState.invalidFields;

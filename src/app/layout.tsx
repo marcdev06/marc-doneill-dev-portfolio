@@ -1,11 +1,13 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { ThemeProvider } from 'next-themes';
 import { Poppins } from 'next/font/google';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { mainContentId, SkipLink } from '@/components/skip-link';
+import { VercelAnalytics } from '@/components/vercel-analytics';
 import { profile } from '@/content/profile';
 import { site } from '@/content/site';
+import { buildOpenGraph } from '@/lib/seo';
 import { getSiteUrl } from '@/lib/site-url';
 import '@/styles/main.scss';
 
@@ -23,6 +25,17 @@ export const metadata: Metadata = {
     template: `%s · ${site.name}`,
   },
   description: site.description,
+  authors: [{ name: profile.name, url: getSiteUrl().href }],
+  openGraph: buildOpenGraph(site, {
+    path: '/',
+    title: site.homeTitle,
+    description: site.description,
+  }),
+  twitter: { card: 'summary_large_image' },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0f1714',
 };
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
@@ -47,10 +60,10 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           <SiteFooter
             ownerName={profile.name}
             copyrightYear={new Date().getFullYear()}
-            designCredit={site.designCredit}
             repository={site.repository}
           />
         </ThemeProvider>
+        <VercelAnalytics />
       </body>
     </html>
   );

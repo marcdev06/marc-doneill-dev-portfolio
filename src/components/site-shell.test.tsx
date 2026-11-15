@@ -35,26 +35,14 @@ describe('site shell', () => {
     expect(within(banner).getByRole('button', { name: 'Open menu' })).toBeVisible();
   });
 
-  it('renders the footer credit, the source link and the copyright line', () => {
+  it('renders the copyright line and the source link', () => {
     render(
-      <SiteFooter
-        ownerName={profile.name}
-        copyrightYear={2026}
-        designCredit={site.designCredit}
-        repository={site.repository}
-      />,
+      <SiteFooter ownerName={profile.name} copyrightYear={2026} repository={site.repository} />,
     );
 
     const footer = screen.getByRole('contentinfo');
     expect(footer).toHaveTextContent('© 2026 Marc Doneill Balatayo');
-    expect(
-      within(footer).getByRole('link', {
-        name: 'Design inspired by Motionfolio by Saba Rezaeian (CC BY 4.0)',
-      }),
-    ).toHaveAttribute(
-      'href',
-      'https://www.figma.com/community/file/1690280357896220844/motionfolio-modern-portfolio-landing-page',
-    );
+    expect(within(footer).getAllByRole('link')).toHaveLength(1);
     expect(
       within(footer).getByRole('link', { name: 'Built with Next.js + Bootstrap' }),
     ).toHaveAttribute('href', 'https://github.com/marcdev06/marc-doneill-dev-portfolio');

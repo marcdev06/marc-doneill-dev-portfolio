@@ -6,7 +6,9 @@ export const profileSchema = z.object({
   shortName: requiredText('Short name'),
   monogram: z.string().regex(/^[A-Z]{2}$/, 'Monogram must be two capital letters'),
   title: requiredText('Title'),
-  location: requiredText('Location'),
+  location: z
+    .string()
+    .regex(/^[^,]+, [A-Z]{2}$/, 'Location reads "City, CC" with a two-letter country code'),
   timeZoneLabel: requiredText('Time zone label'),
   availability: z.object({
     headline: requiredText('Availability headline'),
