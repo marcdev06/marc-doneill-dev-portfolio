@@ -27,7 +27,10 @@ npm run test            # vitest run
 npm run test:watch      # vitest in watch mode
 npm run coverage        # vitest with coverage thresholds
 npm run e2e             # builds, serves on port 4318, runs Playwright + axe
+npm run resume:pdf      # builds, renders /resume to public/resume.pdf + resume.meta.json
 ```
+
+After changing anything the resume shows (profile, experience, skills, education or their headings), run `npm run resume:pdf` and stage both generated files. A Vitest staleness test fails until you do.
 
 Single tests:
 
@@ -51,13 +54,18 @@ First e2e run on a new machine: `npx playwright install chromium`.
 - `src/features/`: self-contained features such as `contact/`.
 - `src/lib/`: pure TypeScript (site URL, content schemas and loaders). No React, no Next.
 - `src/content/`: site content, validated by schemas in `src/lib/content`.
-- `src/styles/`: `_theme.scss` (Bootstrap variable overrides) and `main.scss` (only the Bootstrap partials in use).
+- `src/styles/`: `_theme.scss` (Bootstrap variable overrides, light and dark), `_tokens.scss` (`--pf-*` custom properties per theme), `_site.scss` (site-wide classes and motion) and `main.scss` (only the Bootstrap partials in use). CSS Modules import `_module-helpers.scss` for Bootstrap variables and mixins.
+- `scripts/`: Node scripts run with Node's built-in TypeScript support.
+- `test/`: shared test helpers and content fixtures.
 - `e2e/`: Playwright specs.
 
 ESLint enforces these rules with `no-restricted-imports`:
 
 - `src/lib/**` must not import `react`, `react-dom`, `next`, `next/*`, `@/components`, `@/features` or `@/app`.
 - `src/components/**` must not import `@/features` or `@/app`.
+- `src/content/**` (tests excepted) may import only `@/lib/content`.
+
+Client components must import from `@/lib/content` with `import type` only, so zod stays out of the browser bundle.
 
 Coverage thresholds (Vitest): `src/lib/**` 100%, `src/components/**` and `src/features/**` 90%.
 
@@ -65,6 +73,8 @@ Coverage thresholds (Vitest): `src/lib/**` 100%, `src/components/**` and `src/fe
 
 - Follow the `coding-style` skill: one-line comments of at most 10 words, or none; descriptive names, never single letters (ESLint `id-length` enforces the last part).
 - Style with Bootstrap classes and Sass variables, not compiled-CSS overrides. Never import `bootstrap.bundle.js`; use React-Bootstrap for interactive pieces only.
+- Dark-mode Sass variables (`$body-bg-dark` and friends) live in `_theme.scss`: Bootstrap's `_variables.scss` imports `variables-dark` itself.
+- Dark is the default theme (`next-themes`, `data-bs-theme` on `<html>`). Motion is CSS-only and switched off under `prefers-reduced-motion`.
 - No Tailwind. Every page is statically prerendered; don't enable experimental Next flags.
 - `metadataBase` comes from `getSiteUrl()` in `src/lib/site-url.ts`.
 

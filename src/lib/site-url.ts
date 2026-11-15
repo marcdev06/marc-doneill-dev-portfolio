@@ -9,7 +9,7 @@ function removeTrailingSlashes(url: string): string {
   return url.replace(/\/+$/, '');
 }
 
-export function getSiteUrl(): URL {
+export function getConfiguredSiteUrl(): URL | undefined {
   const configuredUrl = readEnvironmentValue('NEXT_PUBLIC_SITE_URL');
   if (configuredUrl) {
     return new URL(removeTrailingSlashes(configuredUrl));
@@ -20,5 +20,9 @@ export function getSiteUrl(): URL {
     return new URL(`https://${removeTrailingSlashes(vercelProductionHost)}`);
   }
 
-  return new URL(localDevelopmentUrl);
+  return undefined;
+}
+
+export function getSiteUrl(): URL {
+  return getConfiguredSiteUrl() ?? new URL(localDevelopmentUrl);
 }

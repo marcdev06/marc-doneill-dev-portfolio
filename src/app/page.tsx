@@ -1,10 +1,26 @@
-import { siteName } from '@/lib/site-config';
+import { AboutSection } from '@/components/sections/about-section';
+import { ContactSection } from '@/components/sections/contact-section';
+import { ExperienceSection } from '@/components/sections/experience-section';
+import { HeroSection } from '@/components/sections/hero-section';
+import { SkillsSection } from '@/components/sections/skills-section';
+import { experience } from '@/content/experience';
+import { home } from '@/content/home';
+import { profile } from '@/content/profile';
+import { skills } from '@/content/skills';
+import { listSkillTiers } from '@/lib/content';
 
 export default function HomePage() {
   return (
-    <div className="container py-5">
-      <h1>{siteName}</h1>
-      <p className="lead">Placeholder home page. The real sections arrive in a later milestone.</p>
-    </div>
+    <>
+      <HeroSection hero={home.hero} profile={profile} />
+      <ExperienceSection heading={home.experience.heading} entries={experience} />
+      <SkillsSection
+        heading={home.skills.heading}
+        tiers={listSkillTiers(skills)}
+        orbitCenterLabel={profile.monogram}
+      />
+      <AboutSection about={home.about} />
+      <ContactSection contact={home.contact} profile={profile} />
+    </>
   );
 }

@@ -31,6 +31,15 @@ const componentsRestrictedImports = {
   ],
 };
 
+const contentRestrictedImports = {
+  patterns: [
+    {
+      regex: '^(?!@/lib/content$)',
+      message: `${layerMessage} src/content may import only @/lib/content.`,
+    },
+  ],
+};
+
 export default defineConfig([
   ...nextVitals,
   ...nextTypescript,
@@ -59,6 +68,13 @@ export default defineConfig([
     files: ['src/components/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': ['error', componentsRestrictedImports],
+    },
+  },
+  {
+    files: ['src/content/**/*.{ts,tsx}'],
+    ignores: ['src/content/**/*.test.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': ['error', contentRestrictedImports],
     },
   },
   globalIgnores([
