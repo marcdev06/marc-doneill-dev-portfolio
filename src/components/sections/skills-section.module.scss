@@ -1,0 +1,20 @@
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  background-color: var(--pf-surface);
+  border: 1px solid var(--pf-surface-border);
+}
+
+.chipIcon {
+  color: var(--pf-accent-text);
+}

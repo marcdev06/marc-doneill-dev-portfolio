@@ -1,0 +1,40 @@
+# dependencies
+/node_modules
+
+# testing
+/coverage
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/
+/.lighthouseci/
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# production
+/build
+
+# generated resume PDF (gated; never committed)
+/.resume/
+
+# env files (only the example is committed)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# claude code worktrees
+/.claude/worktrees/
+
+# written by the Next 16 dev server
+/AGENTS.md
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*

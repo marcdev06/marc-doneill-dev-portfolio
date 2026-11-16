@@ -1,0 +1,409 @@
+@import '../../styles/module-helpers';
+
+// Measurements from Marc's approved CV mock (A4, one page)
+$sheet-width: 210mm;
+$sheet-height: 297mm;
+$sidebar-width: 72mm;
+$sidebar-inset: 9mm;
+$main-inset-start: 12mm;
+$main-inset-end: 11mm;
+$badge-size: 7mm;
+$timeline-indent: 7mm;
+$ink: #14201c;
+$muted-ink: #4a5a55;
+$accent-ink: #24574c;
+$teal: #2f6b5e;
+$timeline-ring: #c3d6d0;
+$sage: #8fc9b8;
+$amber: #e3a76f;
+$sidebar-text: #e8eeeb;
+$sidebar-muted: #a9b8b3;
+$sidebar-base: #0f1714;
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+.page {
+  padding: 2rem 1rem 4rem;
+  overflow-x: auto;
+}
+
+.sheet {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  grid-template-columns: $sidebar-width minmax(0, 1fr);
+  width: $sheet-width;
+  height: $sheet-height;
+  margin-inline: auto;
+  overflow: hidden;
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 9.3pt;
+  line-height: 1.55;
+  color: $ink;
+  // Opaque stops: PDF viewers draw alpha gradients unevenly
+  background-color: #fff;
+  background-image: radial-gradient(
+    circle at 36mm 45mm,
+    #1f3a31 24mm,
+    #1a2f29 40mm,
+    #172822 62mm,
+    $sidebar-base 115mm
+  );
+  background-repeat: no-repeat;
+  background-size: $sidebar-width 100%;
+  box-shadow: 0 2rem 4rem -2rem rgba(0, 0, 0, 0.45);
+  print-color-adjust: exact;
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  // Zero specificity, so each block's own margins win
+  :where(p, h1, h2, h3, ul, ol, dl, dd) {
+    margin: 0;
+  }
+}
+
+// Each block paints whole, so PDF text keeps DOM order
+.masthead {
+  isolation: isolate;
+  grid-row: 1;
+  grid-column: 2;
+  padding: 17.3mm $main-inset-end 0.7mm $main-inset-start;
+}
+
+.name {
+  font-size: 34pt;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+  color: $ink;
+  text-transform: uppercase;
+}
+
+.accentBar {
+  display: block;
+  width: 16mm;
+  height: 1.2mm;
+  margin-top: 4.9mm;
+  background-color: $amber;
+  border-radius: 0.6mm;
+}
+
+.title {
+  margin-top: 4.2mm;
+  font-family: var(--font-poppins-medium), var(--font-poppins), sans-serif;
+  font-size: 13.5pt;
+  font-weight: 500;
+  line-height: 1.3;
+  color: $accent-ink;
+  letter-spacing: 0.06em;
+}
+
+.sidebarTop {
+  isolation: isolate;
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  align-self: start;
+  padding: 14mm $sidebar-inset 0;
+  color: $sidebar-text;
+}
+
+.sidebarBottom {
+  isolation: isolate;
+  grid-row: 3;
+  grid-column: 1;
+  align-self: stretch;
+  padding: 0 $sidebar-inset;
+  overflow: hidden;
+  color: $sidebar-text;
+}
+
+.mainBody {
+  isolation: isolate;
+  grid-row: 2 / span 2;
+  grid-column: 2;
+  align-self: start;
+  padding: 0 $main-inset-end 0 $main-inset-start;
+}
+
+.photo {
+  display: block;
+  width: 48mm;
+  height: 48mm;
+  margin-inline: auto;
+  object-fit: cover;
+  object-position: 50% 30%;
+  border: 1.1mm solid $sage;
+  border-radius: 50%;
+}
+
+.sidebarSection {
+  margin-top: 9.9mm;
+}
+
+.sidebarTop .sidebarSection {
+  margin-top: 10.9mm;
+}
+
+.mainSection {
+  margin-top: 9.8mm;
+}
+
+.sectionHeading {
+  display: flex;
+  gap: 2.6mm;
+  align-items: center;
+  font-size: 9.5pt;
+  font-weight: $font-weight-bold;
+  line-height: 1;
+  color: $ink;
+  text-transform: uppercase;
+  // Wider tracking extracts as spaced letters, which ATS misreads
+  letter-spacing: 0.1em;
+}
+
+.headingBadge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: $badge-size;
+  height: $badge-size;
+  font-size: 3.4mm;
+  color: #fff;
+  letter-spacing: 0;
+  background-color: $teal;
+  border-radius: 50%;
+}
+
+.sidebarHeading {
+  color: $sage;
+
+  .headingBadge {
+    color: $sage;
+    background-color: transparent;
+    border: 0.3mm solid $sage;
+  }
+}
+
+.contactList {
+  display: grid;
+  gap: 2.9mm;
+  padding: 0;
+  margin-top: 3.5mm;
+  font-size: 8.8pt;
+  line-height: 1.45;
+  list-style: none;
+}
+
+.contactItem {
+  display: grid;
+  grid-template-columns: 4mm minmax(0, 1fr);
+  column-gap: 2mm;
+  align-items: start;
+}
+
+.contactIcon {
+  display: flex;
+  align-items: center;
+  height: 1.45em;
+  color: $sage;
+
+  svg {
+    width: 3.6mm;
+    height: 3.6mm;
+  }
+}
+
+.about {
+  margin-top: 3.1mm;
+  font-size: 10pt;
+  line-height: 1.62;
+  color: $muted-ink;
+}
+
+.timeline {
+  position: relative;
+  padding: 0 0 0 $timeline-indent;
+  margin-top: 3.2mm;
+  list-style: none;
+
+  &::before {
+    position: absolute;
+    top: 2.4mm;
+    bottom: 1mm;
+    left: 3.1mm;
+    width: 0.55mm;
+    content: '';
+    background-color: $teal;
+    border-radius: 0.3mm;
+  }
+}
+
+.timelineEntry {
+  position: relative;
+
+  & + & {
+    margin-top: 6.4mm;
+  }
+
+  // Spread-only shadows stay vector in the PDF
+  &::before {
+    position: absolute;
+    top: 1.33mm;
+    left: -$timeline-indent + 1.93mm;
+    width: 2.9mm;
+    height: 2.9mm;
+    content: '';
+    background-color: $teal;
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 0.75mm #fff,
+      0 0 0 1.25mm $timeline-ring;
+  }
+}
+
+.role + .role {
+  margin-top: 0.5mm;
+}
+
+.role {
+  display: flex;
+  gap: 2.5mm;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.roleTitle {
+  font-size: 10.5pt;
+  font-weight: $font-weight-semibold;
+  line-height: 1.5;
+  color: $ink;
+}
+
+.dates {
+  flex-shrink: 0;
+  font-size: 8.8pt;
+  color: $muted-ink;
+  white-space: nowrap;
+}
+
+.company {
+  margin-top: 0.7mm;
+  font-size: 9pt;
+  line-height: 1.5;
+}
+
+.companyName {
+  font-weight: $font-weight-semibold;
+  color: $accent-ink;
+}
+
+.separator {
+  color: $muted-ink;
+}
+
+.context {
+  font-family: var(--font-poppins-italic), var(--font-poppins), sans-serif;
+  font-style: italic;
+  color: $muted-ink;
+}
+
+.bullets {
+  padding-left: 4.2mm;
+  margin-top: 2.1mm;
+  list-style-type: disc;
+
+  li + li {
+    margin-top: 1mm;
+  }
+
+  li::marker {
+    color: $teal;
+  }
+}
+
+.education {
+  margin-top: 3.6mm;
+}
+
+.degree {
+  font-size: 9pt;
+  font-weight: $font-weight-semibold;
+  line-height: 1.32;
+  color: $sidebar-text;
+}
+
+.school {
+  margin-top: 1.5mm;
+  font-size: 8.6pt;
+  line-height: 1.42;
+  color: $sidebar-muted;
+
+  & + & {
+    margin-top: 0.3mm;
+  }
+}
+
+.skillTiers {
+  position: relative;
+  isolation: isolate;
+  margin-top: 7.5mm;
+}
+
+// Decorative and clipped to the sidebar; text stays above
+.orbitBackdrop {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  width: 74mm;
+  opacity: 0.3;
+  transform: translate(-50%, -50%);
+}
+
+.orbit {
+  --orbit-node-size: 7.2mm;
+
+  width: 100%;
+}
+
+.skillList {
+  display: grid;
+  gap: 5.7mm;
+}
+
+.skillTier {
+  dt {
+    font-size: 7.8pt;
+    font-weight: $font-weight-bold;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  dd {
+    margin-top: 1.2mm;
+    font-size: 8.6pt;
+    line-height: 1.58;
+  }
+}
+
+@media print {
+  :global(body):has(.sheet) {
+    background-color: #fff;
+  }
+
+  .page {
+    padding: 0;
+    overflow: visible;
+  }
+
+  .sheet {
+    margin: 0;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,38 @@
+@function pf-hand-drawn-ellipse($encoded-stroke-color) {
+  @return url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 64' preserveAspectRatio='none'%3E%3Cpath d='M14 34 C 16 14, 70 6, 116 8 C 162 10, 196 20, 194 34 C 192 50, 146 58, 96 57 C 46 56, 6 50, 8 33 C 10 22, 34 14, 60 12' fill='none' stroke='#{$encoded-stroke-color}' stroke-width='3' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+}
+
+:root,
+[data-bs-theme='light'] {
+  --pf-hand-drawn-ellipse: #{pf-hand-drawn-ellipse('%239a5b2e')};
+  --pf-accent-text: #{$pf-accent-text};
+  --pf-warm: #{$pf-warm};
+  --pf-warm-text: #{$pf-warm-text};
+  --pf-warm-soft: #{$pf-warm-soft};
+  --pf-warm-border: #{$pf-warm-border};
+  --pf-glow: #{$pf-glow};
+  --pf-glow-warm: #{$pf-glow-warm};
+  --pf-surface: #{$pf-surface};
+  --pf-surface-border: #{$border-color};
+  --pf-border-strong: #{$pf-border-strong};
+  --pf-ring: #{$pf-ring};
+  --pf-ring-soft: #{$pf-ring-soft};
+  --pf-input-border: #{$pf-input-border};
+}
+
+@include color-mode(dark, true) {
+  --pf-hand-drawn-ellipse: #{pf-hand-drawn-ellipse('%23e3a76f')};
+  --pf-accent-text: #{$pf-accent-text-dark};
+  --pf-warm: #{$pf-warm-dark};
+  --pf-warm-text: #{$pf-warm-text-dark};
+  --pf-warm-soft: #{$pf-warm-soft-dark};
+  --pf-warm-border: #{$pf-warm-border-dark};
+  --pf-glow: #{$pf-glow-dark};
+  --pf-glow-warm: #{$pf-glow-warm-dark};
+  --pf-surface: #{$pf-surface-dark};
+  --pf-surface-border: #{$border-color-dark};
+  --pf-border-strong: #{$pf-border-strong-dark};
+  --pf-ring: #{$pf-ring-dark};
+  --pf-ring-soft: #{$pf-ring-soft-dark};
+  --pf-input-border: #{$pf-input-border-dark};
+}

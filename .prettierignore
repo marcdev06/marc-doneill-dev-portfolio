@@ -1,0 +1,10 @@
+.next/
+out/
+build/
+coverage/
+playwright-report/
+test-results/
+.lighthouseci/
+.claude/
+next-env.d.ts
+package-lock.json

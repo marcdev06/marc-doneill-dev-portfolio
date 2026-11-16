@@ -1,0 +1,63 @@
+{
+  "name": "marc-doneill-dev-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "next typegen && tsc --noEmit",
+    "lint": "next typegen && eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "e2e": "playwright test",
+    "lighthouse": "lhci autorun",
+    "resume:pdf": "node scripts/generate-resume-pdf.ts",
+    "resume:publish": "node scripts/publish-resume-pdf.ts"
+  },
+  "dependencies": {
+    "@upstash/ratelimit": "~2.2.1",
+    "@upstash/redis": "~1.41.0",
+    "@vercel/analytics": "~2.0.1",
+    "bootstrap": "5.3.9",
+    "botid": "~1.5.13",
+    "next": "16.4.6",
+    "next-themes": "0.4.6",
+    "react": "19.3.1",
+    "react-bootstrap": "2.10.10",
+    "react-dom": "19.3.1",
+    "resend": "~6.38.1",
+    "simple-icons": "~16.37.0",
+    "zod": "~4.6.7"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "~4.14.0",
+    "@lhci/cli": "~0.16.1",
+    "@playwright/test": "1.65.1",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.10",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "@vitest/coverage-v8": "^5.1.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.4.6",
+    "jsdom": "^31.0.1",
+    "prettier": "~3.10.1",
+    "sass": "~1.108.2",
+    "schema-dts": "~2.1.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0"
+  }
+}

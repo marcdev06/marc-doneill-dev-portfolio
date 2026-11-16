@@ -1,0 +1,101 @@
+@import '../../styles/module-helpers';
+
+.dialog {
+  width: min(100% - 1.5rem, 34rem);
+  max-height: calc(100dvh - 1.5rem);
+  padding: 1.25rem;
+  color: var(--#{$prefix}body-color);
+  text-align: start;
+  background-color: var(--pf-surface);
+  border: 1px solid var(--pf-border-strong);
+  border-radius: $border-radius;
+  box-shadow: 0 2rem 4rem -1rem rgba(0, 0, 0, 0.45);
+
+  @include media-breakpoint-up(sm) {
+    padding: 1.75rem 2rem 2rem;
+  }
+
+  &::backdrop {
+    background-color: rgba(6, 12, 10, 0.72);
+  }
+}
+
+.header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: $h3-font-size * 1.2;
+}
+
+.intro {
+  margin-bottom: 1.25rem;
+  color: var(--#{$prefix}secondary-color);
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.honeypot {
+  position: absolute;
+  inset-inline-start: -100vw;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.status:not(:empty) {
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+  margin-top: 1.25rem;
+}
+
+.statusMessage {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  margin: 0;
+  background-color: color-mix(in srgb, var(--pf-accent-text) 10%, transparent);
+  border: 1px solid var(--pf-surface-border);
+  border-inline-start: 4px solid var(--pf-accent-text);
+  border-radius: $border-radius-sm;
+}
+
+.problemMessage {
+  background-color: color-mix(in srgb, var(--#{$prefix}form-invalid-color) 10%, transparent);
+  border-inline-start-color: var(--#{$prefix}form-invalid-border-color);
+}
+
+.spinner {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--pf-border-strong);
+  border-top-color: var(--pf-accent-text);
+  border-radius: 50%;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: resume-request-spin 0.9s linear infinite;
+  }
+}
+
+.downloadLink {
+  display: inline-flex;
+  align-items: center;
+}
+
+@keyframes resume-request-spin {
+  to {
+    rotate: 360deg;
+  }
+}
