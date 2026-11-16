@@ -13,12 +13,11 @@ export const profile = parseContent(
       headline: 'Open to freelance & contract work',
       detail: 'Open to freelance, contract, part-time and flexible work.',
     },
-    email: 'balatayo.marcdoneill@gmail.com',
     links: {
       github: 'https://github.com/marcdev06',
       linkedin: 'https://www.linkedin.com/in/marcdev06',
     },
-    resumePath: '/resume.pdf',
+    resumeFileName: 'Marc_Doneill_Balatayo_CV.pdf',
     photo: {
       src: '/images/profile-photo.jpg',
       alt: 'Portrait of Marc Doneill Balatayo',

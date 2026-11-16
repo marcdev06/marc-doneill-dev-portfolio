@@ -9,11 +9,11 @@ describe('HeroSection', () => {
     render(<HeroSection hero={home.hero} profile={profile} />);
 
     const hero = screen.getByRole('region', {
-      name: 'Building software that makes life easier for every Filipino.',
+      name: 'Building software that makes everyday life easier.',
     });
     expect(within(hero).getByText('Open to freelance & contract work')).toBeVisible();
     expect(within(hero).getByText("Hi, I'm Marc Doneill Balatayo")).toBeVisible();
-    expect(within(hero).getByText('every Filipino')).toBeVisible();
+    expect(within(hero).getByText('everyday life')).toBeVisible();
     expect(
       within(hero).getByText("I'm a full-stack software engineer.", {
         selector: '.visually-hidden',
@@ -36,11 +36,11 @@ describe('HeroSection', () => {
   it('keeps the circled highlight as plain text inside the heading', () => {
     render(<HeroSection hero={home.hero} profile={profile} />);
 
-    const highlight = screen.getByText('every Filipino');
+    const highlight = screen.getByText('everyday life');
     expect(highlight.tagName).toBe('SPAN');
     expect(highlight.childElementCount).toBe(0);
     expect(highlight.closest('h1')).toHaveAccessibleName(
-      'Building software that makes life easier for every Filipino.',
+      'Building software that makes everyday life easier.',
     );
   });
 

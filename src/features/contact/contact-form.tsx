@@ -1,8 +1,8 @@
 'use client';
 
 import { useActionState, useEffect, useRef } from 'react';
-import { EmailAddress } from '@/components/ui/email-address';
 import { joinClassNames } from '@/components/ui/join-class-names';
+import { useLazyBotProtection } from '@/features/bot-protection/use-lazy-bot-protection';
 import {
   contactFieldLimits,
   contactHoneypotFieldName,
@@ -12,11 +12,10 @@ import type { ContactFormCopy } from '@/lib/content';
 import { initialContactFormState, type ContactFormState } from './contact-form-state';
 import styles from './contact-form.module.scss';
 import { submitContactMessage } from './submit-contact-message';
-import { useLazyBotProtection } from './use-lazy-bot-protection';
 
 interface ContactFormProps {
   copy: ContactFormCopy;
-  email: string;
+  linkedinUrl: string;
 }
 
 const privacyNoteId = 'contact-privacy-note';
@@ -60,7 +59,7 @@ function FieldError({ fieldName, formState, copy }: FieldErrorProps) {
   );
 }
 
-export function ContactForm({ copy, email }: ContactFormProps) {
+export function ContactForm({ copy, linkedinUrl }: ContactFormProps) {
   const [formState, submitAction, isPending] = useActionState(
     submitContactMessage,
     initialContactFormState,
@@ -163,11 +162,9 @@ export function ContactForm({ copy, email }: ContactFormProps) {
             key={formState.submissionCount}
             className={joinClassNames(styles.statusMessage, styles.failureMessage)}
           >
-            {copy.failureMessage.beforeEmail}
-            <a href={`mailto:${email}`}>
-              <EmailAddress address={email} />
-            </a>
-            {copy.failureMessage.afterEmail}
+            {copy.failureMessage.beforeLink}
+            <a href={linkedinUrl}>{copy.failureMessage.linkLabel}</a>
+            {copy.failureMessage.afterLink}
           </p>
         )}
       </div>

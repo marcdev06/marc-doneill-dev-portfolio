@@ -51,16 +51,30 @@ describe('siteSchema', () => {
     ]);
   });
 
-  it('requires an Open Graph locale, image alt text and resume page copy', () => {
+  it('requires an Open Graph locale, image alt text and resume document copy', () => {
     const siteInput = buildSiteInput();
     siteInput.locale = 'en-PH';
     siteInput.openGraphImageAlt = ' ';
-    siteInput.resumePage = { title: 'Resume', description: '' };
+    siteInput.resumePage = { documentTitle: '', headings: { contact: 'Contact', about: ' ' } };
 
     expect(listIssues(siteSchema, siteInput)).toEqual([
       { path: 'locale', message: 'Locale reads like en_PH' },
       { path: 'openGraphImageAlt', message: 'Open Graph image alt text is required' },
-      { path: 'resumePage.description', message: 'Resume page description is required' },
+      { path: 'resumePage.documentTitle', message: 'Resume document title is required' },
+      { path: 'resumePage.headings.about', message: 'Resume about heading is required' },
+    ]);
+  });
+
+  it('requires every piece of resume review copy', () => {
+    const siteInput = buildSiteInput();
+    siteInput.resumeReview.labels.decideBy = '';
+    siteInput.resumeReview.statusLabels.expired = ' ';
+    siteInput.resumeReview.approveLabel = '';
+
+    expect(listIssues(siteSchema, siteInput)).toEqual([
+      { path: 'resumeReview.labels.decideBy', message: 'Decide-by label is required' },
+      { path: 'resumeReview.statusLabels.expired', message: 'Expired status label is required' },
+      { path: 'resumeReview.approveLabel', message: 'Approve button label is required' },
     ]);
   });
 });
@@ -75,18 +89,24 @@ describe('profileSchema', () => {
       ...buildProfileInput(),
       name: '   ',
       monogram: 'ae',
-      email: 'ada-at-example',
-      resumePath: '/resume.docx',
+      resumeFileName: 'Ada CV.docx',
       links: { github: 'github.com/ada', linkedin: 'https://www.linkedin.com/in/ada' },
     };
 
     expect(listIssues(profileSchema, profileInput)).toEqual([
       { path: 'name', message: 'Name is required' },
       { path: 'monogram', message: 'Monogram must be two capital letters' },
-      { path: 'email', message: 'Email must be a valid address' },
       { path: 'links.github', message: 'Use an absolute https:// URL' },
-      { path: 'resumePath', message: 'Resume path must end in .pdf' },
+      {
+        path: 'resumeFileName',
+        message: 'Resume file name uses letters, digits, _ or - and ends in .pdf',
+      },
     ]);
+  });
+
+  it('holds no email address, which stays in server env only', () => {
+    expect(profileSchema.shape).not.toHaveProperty('email');
+    expect(JSON.stringify(profileSchema.parse(buildProfileInput()))).not.toContain('@');
   });
 
   it.each(['Taguig City', 'Taguig City, Philippines', ', PH'])(
@@ -119,14 +139,30 @@ describe('homeSchema', () => {
     const homeInput = buildHomeInput();
     homeInput.contact.form.fields.email.label = ' ';
     homeInput.contact.form.successMessage = '';
-    homeInput.contact.form.failureMessage.beforeEmail = '';
+    homeInput.contact.form.failureMessage.linkLabel = '';
 
     expect(listIssues(homeSchema, homeInput)).toEqual([
       { path: 'contact.form.fields.email.label', message: 'Form field label is required' },
       { path: 'contact.form.successMessage', message: 'Success message is required' },
+      { path: 'contact.form.failureMessage.linkLabel', message: 'Message link label is required' },
+    ]);
+  });
+
+  it('requires every piece of resume request copy', () => {
+    const homeInput = buildHomeInput();
+    homeInput.contact.resumeRequest.fields.note.label = '';
+    homeInput.contact.resumeRequest.waitingMessage = ' ';
+    homeInput.contact.resumeRequest.rateLimitedMessage = '';
+
+    expect(listIssues(homeSchema, homeInput)).toEqual([
       {
-        path: 'contact.form.failureMessage.beforeEmail',
-        message: 'Failure message text before the email is required',
+        path: 'contact.resumeRequest.fields.note.label',
+        message: 'Form field label is required',
+      },
+      { path: 'contact.resumeRequest.waitingMessage', message: 'Waiting message is required' },
+      {
+        path: 'contact.resumeRequest.rateLimitedMessage',
+        message: 'Rate-limited message is required',
       },
     ]);
   });

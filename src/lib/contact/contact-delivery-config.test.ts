@@ -11,6 +11,16 @@ describe('readContactDeliveryConfig', () => {
     expect(readContactDeliveryConfig({ CONTACT_DELIVERY: ' log ' })).toEqual({ mode: 'log' });
   });
 
+  it('also appends logged emails to CONTACT_LOG_FILE, but never on Vercel', () => {
+    const logEnvironment = { CONTACT_DELIVERY: 'log', CONTACT_LOG_FILE: '/tmp/emails.log' };
+
+    expect(readContactDeliveryConfig(logEnvironment)).toEqual({
+      mode: 'log',
+      logFilePath: '/tmp/emails.log',
+    });
+    expect(readContactDeliveryConfig({ ...logEnvironment, VERCEL: '1' })).toEqual({ mode: 'log' });
+  });
+
   it('defaults to Resend with the onboarding sender', () => {
     expect(readContactDeliveryConfig(resendEnvironment)).toEqual({
       mode: 'resend',

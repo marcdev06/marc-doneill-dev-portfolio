@@ -16,6 +16,11 @@ const securityHeaders = [
   { key: 'Content-Security-Policy', value: contentSecurityPolicy },
 ];
 
+const privateReviewHeaders = [
+  { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+  { key: 'Referrer-Policy', value: 'no-referrer' },
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   sassOptions: {
@@ -25,7 +30,11 @@ const nextConfig: NextConfig = {
     loadPaths: [path.join(import.meta.dirname, 'node_modules', 'bootstrap', 'scss')],
   },
   headers() {
-    return Promise.resolve([{ source: '/:path*', headers: securityHeaders }]);
+    return Promise.resolve([
+      { source: '/:path*', headers: securityHeaders },
+      // Review links carry a token; keep it out of indexes and referrers
+      { source: '/resume-requests/:path*', headers: privateReviewHeaders },
+    ]);
   },
 };
 

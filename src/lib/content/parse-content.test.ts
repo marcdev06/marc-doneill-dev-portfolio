@@ -11,10 +11,10 @@ describe('parseContent', () => {
   });
 
   it('names the module, the field and the problem when content is invalid', () => {
-    const invalidProfile = { ...buildProfileInput(), email: 'not-an-email' };
+    const invalidProfile = { ...buildProfileInput(), monogram: 'ab' };
 
     expect(() => parseContent(profileSchema, invalidProfile, 'src/content/profile.ts')).toThrow(
-      /Invalid content in src\/content\/profile\.ts:\n.*Email must be a valid address\n.*→ at email/,
+      /Invalid content in src\/content\/profile\.ts:\n.*Monogram must be two capital letters\n.*→ at monogram/,
     );
   });
 });

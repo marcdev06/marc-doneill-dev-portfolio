@@ -1,13 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
+import { useMemoryRequestStore, useUnconfiguredRequestStore } from '../../../test/request-services';
 import { initialContactFormState } from './contact-form-state';
 import { submitContactMessage } from './submit-contact-message';
 
-const { checkBotId, sendEmail } = vi.hoisted(() => ({
+const { checkBotId, sendEmail, requestHeaders } = vi.hoisted(() => ({
   checkBotId: vi.fn(),
   sendEmail: vi.fn(),
+  requestHeaders: { current: new Headers() },
 }));
 
 vi.mock('botid/server', () => ({ checkBotId }));
+vi.mock('next/headers', () => ({ headers: () => Promise.resolve(requestHeaders.current) }));
 vi.mock('resend', () => ({
   Resend: vi.fn(function FakeResend() {
     return { emails: { send: sendEmail } };
@@ -41,6 +44,8 @@ describe('submitContactMessage', () => {
     vi.stubEnv('CONTACT_DELIVERY', 'log');
     vi.stubEnv('RESEND_API_KEY', '');
     vi.stubEnv('CONTACT_TO_EMAIL', '');
+    useMemoryRequestStore();
+    requestHeaders.current = new Headers({ 'x-forwarded-for': '203.0.113.7' });
     checkBotId.mockReset().mockResolvedValue({ isBot: false });
     sendEmail.mockReset().mockResolvedValue({ data: { id: 'email-id' }, error: null });
     consoleInfo = vi.spyOn(console, 'info').mockImplementation(() => undefined);
@@ -66,7 +71,7 @@ describe('submitContactMessage', () => {
     expect(consoleInfo).toHaveBeenCalledTimes(1);
     expect(consoleInfo.mock.calls[0]?.[0]).toBe(
       [
-        '[contact] CONTACT_DELIVERY=log, so this message was logged, not sent:',
+        '[email] CONTACT_DELIVERY=log, so this email was logged, not sent:',
         'Subject: Portfolio contact from Jane Doe',
         'Reply-To: jane@example.com',
         '',
@@ -201,8 +206,47 @@ describe('submitContactMessage', () => {
     expect(consoleError).toHaveBeenCalledWith(
       '[contact] Sending the message failed:',
       expect.objectContaining({
-        message: 'Resend rejected the message: rate_limit_exceeded (Too many requests.)',
+        message: 'Resend rejected the email: rate_limit_exceeded (Too many requests.)',
       }),
+    );
+  });
+
+  it('allows 5 messages per IP an hour, then fails without saying why', async () => {
+    for (let messageIndex = 0; messageIndex < 5; messageIndex += 1) {
+      expect((await submit(validFields)).status).toBe('sent');
+    }
+
+    const formState = await submit(validFields);
+
+    expect(formState.status).toBe('failed');
+    expect(formState.values).toEqual(validFields);
+    expect(consoleWarn).toHaveBeenCalledWith(
+      '[contact] A rate limit was reached; nothing was sent.',
+    );
+    expect(consoleInfo).toHaveBeenCalledTimes(5);
+
+    requestHeaders.current = new Headers({ 'x-forwarded-for': '198.51.100.4' });
+    expect((await submit(validFields)).status).toBe('sent');
+  });
+
+  it('skips the limit with a server log when Redis is not configured', async () => {
+    useUnconfiguredRequestStore();
+
+    for (let messageIndex = 0; messageIndex < 6; messageIndex += 1) {
+      expect((await submit(validFields)).status).toBe('sent');
+    }
+    expect(consoleWarn).toHaveBeenCalledWith(
+      expect.stringMatching(/^\[contact\] Rate limit skipped: Set KV_REST_API_URL/),
+    );
+  });
+
+  it('still sends when the rate limit check itself errors', async () => {
+    useMemoryRequestStore({ RESUME_REQUEST_FIXTURE_PDF: 'missing-fixture.pdf' });
+
+    expect((await submit(validFields)).status).toBe('sent');
+    expect(consoleError).toHaveBeenCalledWith(
+      '[contact] Rate limit check failed; the message is allowed:',
+      expect.objectContaining({ code: 'ENOENT' }),
     );
   });
 });

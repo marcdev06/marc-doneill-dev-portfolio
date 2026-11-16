@@ -6,25 +6,27 @@ import { AboutSection } from './about-section';
 import { ContactSection } from './contact-section';
 
 describe('ContactSection', () => {
-  it('renders the form slot below the intro and above the direct links', () => {
+  it('renders the form slot below the intro and the resume slot beside the profiles', () => {
     render(
       <ContactSection
         contact={home.contact}
         profile={profile}
         form={<form aria-label="Slot form" />}
+        resumeRequest={<button type="button">Slot resume request</button>}
       />,
     );
 
     const section = screen.getByRole('region', { name: "Let's build something" });
     const slotForm = within(section).getByRole('form', { name: 'Slot form' });
     const intro = within(section).getByText(profile.availability.detail);
-    const emailLink = within(section).getByRole('link', { name: profile.email });
+    const githubLink = within(section).getByRole('link', { name: 'GitHub profile' });
+    const resumeButton = within(section).getByRole('button', { name: 'Slot resume request' });
     expect(intro.compareDocumentPosition(slotForm)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(slotForm.compareDocumentPosition(emailLink)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(within(section).getByRole('link', { name: 'Download resume' })).toBeVisible();
+    expect(slotForm.compareDocumentPosition(githubLink)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(githubLink.compareDocumentPosition(resumeButton)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
-  it('offers email, profiles and the resume download without a form slot', () => {
+  it('offers the profiles without slots, and no email address or mailto link', () => {
     const { container } = render(<ContactSection contact={home.contact} profile={profile} />);
 
     const section = screen.getByRole('region', { name: "Let's build something" });
@@ -32,15 +34,17 @@ describe('ContactSection', () => {
     expect(
       within(section).getByText('Open to freelance, contract, part-time and flexible work.'),
     ).toBeVisible();
-    expect(
-      within(section).getByRole('link', { name: 'balatayo.marcdoneill@gmail.com' }),
-    ).toHaveAttribute('href', 'mailto:balatayo.marcdoneill@gmail.com');
-    expect(within(section).getByRole('link', { name: 'GitHub profile' })).toBeVisible();
-    expect(within(section).getByRole('link', { name: 'LinkedIn profile' })).toBeVisible();
-
-    const resumeLink = within(section).getByRole('link', { name: 'Download resume' });
-    expect(resumeLink).toHaveAttribute('href', '/resume.pdf');
-    expect(resumeLink).toHaveAttribute('download');
+    expect(within(section).getByRole('link', { name: 'GitHub profile' })).toHaveAttribute(
+      'href',
+      'https://github.com/marcdev06',
+    );
+    expect(within(section).getByRole('link', { name: 'LinkedIn profile' })).toHaveAttribute(
+      'href',
+      'https://www.linkedin.com/in/marcdev06',
+    );
+    expect(within(section).getAllByRole('link')).toHaveLength(2);
+    expect(container.querySelector('a[href^="mailto"]')).toBeNull();
+    expect(container.innerHTML).not.toContain('@');
     expect(container.querySelector('form')).toBeNull();
   });
 });

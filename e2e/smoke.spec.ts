@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { homeTitle } from './helpers';
+import { homeTitle, readRenderedLines } from './helpers';
 
 const unknownPath = '/this-page-does-not-exist';
 
@@ -22,8 +22,11 @@ test.describe('site shell', () => {
     await expect(
       page.getByRole('heading', {
         level: 1,
-        name: 'Building software that makes life easier for every Filipino.',
+        name: 'Building software that makes everyday life easier.',
       }),
+    ).toBeVisible();
+    await expect(
+      page.locator('section#skills').getByRole('heading', { level: 2, name: 'Technical Skills' }),
     ).toBeVisible();
     for (const sectionId of ['experience', 'skills', 'about', 'contact']) {
       await expect(page.locator(`section#${sectionId}`)).toHaveCount(1);
@@ -69,27 +72,25 @@ test.describe('site shell', () => {
 });
 
 test.describe('resume', () => {
-  test('serves the generated PDF', async ({ request }) => {
-    const response = await request.get('/resume.pdf');
-
-    expect(response.status()).toBe(200);
-    expect(response.headers()['content-type']).toContain('application/pdf');
-  });
-
-  test('renders the printable resume page in the light theme', async ({ page }) => {
+  test('renders the local print page in ATS order, without an email or download link', async ({
+    page,
+  }) => {
     await page.goto('/resume');
 
-    await expect(page).toHaveTitle('Resume · Marc Doneill Balatayo');
+    await expect(page).toHaveTitle('Marc Doneill Balatayo – CV');
     const resumeSheet = page.getByRole('article', { name: 'Marc Doneill Balatayo' });
-    await expect(resumeSheet).toHaveAttribute('data-bs-theme', 'light');
+    await expect(resumeSheet).toHaveAttribute('data-file-name', 'Marc_Doneill_Balatayo_CV.pdf');
     await expect(resumeSheet.getByRole('heading', { level: 2 })).toHaveText([
+      'Contact',
+      'About me',
       'Experience',
-      'Skills',
       'Education',
+      'Technical Skills',
     ]);
-    await expect(page.getByRole('link', { name: 'Download resume' })).toHaveAttribute(
-      'href',
-      '/resume.pdf',
-    );
+    for (const sectionHeading of await resumeSheet.getByRole('heading', { level: 2 }).all()) {
+      expect(await readRenderedLines(sectionHeading)).toHaveLength(1);
+    }
+    await expect(resumeSheet).not.toContainText('@');
+    await expect(page.locator('a[href$=".pdf"]')).toHaveCount(0);
   });
 });

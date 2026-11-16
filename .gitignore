@@ -18,6 +18,9 @@ next-env.d.ts
 # production
 /build
 
+# generated resume PDF (gated; never committed)
+/.resume/
+
 # env files (only the example is committed)
 .env*
 !.env.example
@@ -27,6 +30,9 @@ next-env.d.ts
 
 # claude code worktrees
 /.claude/worktrees/
+
+# written by the Next 16 dev server
+/AGENTS.md
 
 # misc
 .DS_Store

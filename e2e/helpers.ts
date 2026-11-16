@@ -1,8 +1,37 @@
+import { randomInt } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page, type Response } from '@playwright/test';
+import { buildEmailLogPath } from './server-urls';
 
 export const homeTitle = 'Marc Doneill Balatayo · Full-Stack Software Engineer';
 export const headerHeightPixels = 72;
+const serverActionTimeoutMs = 20_000;
+
+// Hydrated forms fetch with Next-Action; script-free forms navigate
+function isServerActionPost(response: Response): boolean {
+  const request = response.request();
+  return (
+    request.method() === 'POST' &&
+    (request.headers()['next-action'] !== undefined || request.isNavigationRequest())
+  );
+}
+
+// Fails as "no response" before any assertion on the answer
+export async function clickAndAwaitServerAction(submitControl: Locator): Promise<Response> {
+  const clickedAtMs = Date.now();
+  const [actionResponse] = await Promise.all([
+    submitControl.page().waitForResponse(isServerActionPost, { timeout: serverActionTimeoutMs }),
+    submitControl.click(),
+  ]);
+  const roundTripMs = Date.now() - clickedAtMs;
+  test.info().annotations.push({
+    type: 'server-action',
+    description: `HTTP ${String(actionResponse.status())} after ${String(roundTripMs)} ms`,
+  });
+  expect(actionResponse.status(), 'Server Action response status').toBeLessThan(400);
+  return actionResponse;
+}
 
 export async function expectNoAxeViolations(page: Page) {
   const axeResults = await new AxeBuilder({ page }).analyze();
@@ -43,56 +72,6 @@ export async function readRenderedLines(textLocator: Locator): Promise<string[]>
   });
 }
 
-export async function readTextNodeWidth(textLocator: Locator, text: string): Promise<number> {
-  await textLocator.page().evaluate(async () => {
-    await document.fonts.ready;
-  });
-  return textLocator.evaluate((element, wantedText) => {
-    const textWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-    for (let textNode = textWalker.nextNode(); textNode; textNode = textWalker.nextNode()) {
-      if (textNode.textContent === wantedText) {
-        const textRange = document.createRange();
-        textRange.selectNodeContents(textNode);
-        return textRange.getBoundingClientRect().width;
-      }
-    }
-    throw new Error(`No text node reads "${wantedText}"`);
-  }, text);
-}
-
-export async function readContentWidth(boxLocator: Locator): Promise<number> {
-  return boxLocator.evaluate((element) => {
-    const boxStyle = getComputedStyle(element);
-    return (
-      element.clientWidth - parseFloat(boxStyle.paddingLeft) - parseFloat(boxStyle.paddingRight)
-    );
-  });
-}
-
-export async function expectTextToFitWithRoom(
-  textLocator: Locator,
-  text: string,
-  boxLocator: Locator,
-) {
-  const textWidth = await readTextNodeWidth(textLocator, text);
-  const availableWidth = await readContentWidth(boxLocator);
-  // At most 90%, so wider font rendering still fits
-  expect(
-    textWidth,
-    `"${text}" is ${textWidth.toFixed(1)} of ${availableWidth.toFixed(1)} px`,
-  ).toBeLessThanOrEqual(availableWidth * 0.9);
-}
-
-export const contactEmail = 'balatayo.marcdoneill@gmail.com';
-const contactEmailBeforeBreak = 'balatayo.marcdoneill@';
-
-export async function expectEmailToWrapWithRoom(emailLink: Locator, boxLocator: Locator) {
-  expect([[contactEmail], [contactEmailBeforeBreak, 'gmail.com']]).toContainEqual(
-    await readRenderedLines(emailLink),
-  );
-  await expectTextToFitWithRoom(emailLink, contactEmailBeforeBreak, boxLocator);
-}
-
 export async function expectHeadingBelowHeader(heading: Locator) {
   await expect(heading).toBeInViewport();
   await expect
@@ -101,4 +80,39 @@ export async function expectHeadingBelowHeader(heading: Locator) {
       return headingBox ? Math.round(headingBox.y) : -1;
     })
     .toBeGreaterThanOrEqual(headerHeightPixels);
+}
+
+// Each test gets its own IP, so per-IP rate limits never collide
+export async function useUniqueClientIp(page: Page) {
+  const clientIp = [10, randomInt(256), randomInt(256), randomInt(1, 255)].join('.');
+  await page.setExtraHTTPHeaders({ 'x-forwarded-for': clientIp });
+  return clientIp;
+}
+
+export function buildUniqueEmail(label: string): string {
+  return `${label}-${String(Date.now())}-${String(randomInt(1_000_000))}@example.com`;
+}
+
+async function readLoggedEmails(port: number): Promise<string> {
+  try {
+    return await readFile(buildEmailLogPath(port), 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+// The log sender's file is the e2e seam for review links
+export async function readReviewPath(port: number, requesterEmail: string): Promise<string> {
+  let reviewPath = '';
+  await expect
+    .poll(async () => {
+      const loggedEmail = (await readLoggedEmails(port))
+        .split('[email] ')
+        .find((emailBlock) => emailBlock.includes(`Reply-To: ${requesterEmail}`));
+      const reviewLink = /^https?:\/\/\S+\/resume-requests\/\S+$/m.exec(loggedEmail ?? '')?.[0];
+      reviewPath = reviewLink ? `${new URL(reviewLink).pathname}${new URL(reviewLink).search}` : '';
+      return reviewPath;
+    })
+    .not.toBe('');
+  return reviewPath;
 }

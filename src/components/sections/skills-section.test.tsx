@@ -1,14 +1,31 @@
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { home } from '@/content/home';
 import { skills } from '@/content/skills';
 import { listSkillTiers } from '@/lib/content';
 import { SkillsSection } from './skills-section';
 
 function renderSkillsSection() {
-  render(<SkillsSection heading="Skills" tiers={listSkillTiers(skills)} orbitCenterLabel="MB" />);
+  render(
+    <SkillsSection
+      heading={home.skills.heading}
+      tiers={listSkillTiers(skills)}
+      orbitCenterLabel="MB"
+    />,
+  );
 }
 
 describe('SkillsSection', () => {
+  it('titles the section Technical Skills under the unchanged skills anchor', () => {
+    renderSkillsSection();
+
+    const section = screen.getByRole('region', { name: 'Technical Skills' });
+    expect(section).toHaveAttribute('id', 'skills');
+    expect(within(section).getByRole('heading', { level: 2 })).toHaveTextContent(
+      'Technical Skills',
+    );
+  });
+
   it('always renders an accessible list for each tier', () => {
     renderSkillsSection();
 
@@ -71,7 +88,11 @@ describe('SkillsSection', () => {
 
   it('defines each icon path once in a sprite', () => {
     const { container } = render(
-      <SkillsSection heading="Skills" tiers={listSkillTiers(skills)} orbitCenterLabel="MB" />,
+      <SkillsSection
+        heading={home.skills.heading}
+        tiers={listSkillTiers(skills)}
+        orbitCenterLabel="MB"
+      />,
     );
 
     const symbolIds = [...container.querySelectorAll('symbol')].map((symbol) => symbol.id);

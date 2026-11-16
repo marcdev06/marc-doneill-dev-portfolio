@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { contactEmail, expectEmailToWrapWithRoom, expectHeadingBelowHeader } from './helpers';
+import { expectHeadingBelowHeader, readRenderedLines } from './helpers';
 
 const sectionHeadings = [
   { linkName: 'Experience', headingName: 'Experience' },
@@ -74,15 +74,6 @@ for (const phoneWidth of [375, 320]) {
       }));
       expect(pageWidths.scrollWidth).toBe(pageWidths.clientWidth);
     });
-
-    test('wraps the contact email only after the @, with room to spare', async ({ page }) => {
-      await page.goto('/');
-
-      const emailLink = page.getByRole('link', { name: contactEmail, exact: true });
-      await expect(emailLink).toHaveAttribute('href', `mailto:${contactEmail}`);
-      // The address span is the flex item, so it shows the real room
-      await expectEmailToWrapWithRoom(emailLink, emailLink.locator('span'));
-    });
   });
 }
 
@@ -96,8 +87,7 @@ test.describe('touch targets', () => {
       page.getByRole('link', { name: 'See experience' }),
       page.getByRole('link', { name: 'GitHub profile' }).first(),
       page.getByRole('link', { name: 'LinkedIn profile' }).first(),
-      page.getByRole('link', { name: 'balatayo.marcdoneill@gmail.com' }),
-      page.getByRole('link', { name: 'Download resume' }),
+      page.getByRole('button', { name: 'Request my resume' }),
       page.getByRole('link', { name: 'Built with Next.js + Bootstrap' }),
       page.getByRole('link', { name: 'Marc Balatayo' }),
       page.getByLabel('Name', { exact: true }),
@@ -115,4 +105,24 @@ test.describe('touch targets', () => {
       expect(controlBox?.width).toBeGreaterThanOrEqual(44);
     }
   });
+});
+
+test.describe('headline highlight', () => {
+  for (const viewportWidth of [320, 375, 768, 1280]) {
+    test(`keeps "everyday life" on one line inside the ellipse at ${String(viewportWidth)} px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: viewportWidth, height: 900 });
+      await page.goto('/');
+
+      const highlight = page.getByRole('heading', { level: 1 }).getByText('everyday life');
+      expect(await readRenderedLines(highlight)).toEqual(['everyday life']);
+      // The ellipse overhangs the text by 0.5em but stays on screen
+      const highlightBox = await highlight.boundingBox();
+      expect(highlightBox?.x).toBeGreaterThanOrEqual(0);
+      expect((highlightBox?.x ?? 0) + (highlightBox?.width ?? 0)).toBeLessThanOrEqual(
+        viewportWidth,
+      );
+    });
+  }
 });
