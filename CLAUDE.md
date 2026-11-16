@@ -20,7 +20,7 @@ npm run dev             # dev server on http://localhost:3000
 npm run build           # production build (Turbopack)
 npm run start           # serve the production build
 npm run typecheck       # next typegen && tsc --noEmit
-npm run lint            # eslint . (includes the layer guards and id-length)
+npm run lint            # next typegen && eslint . (includes the layer guards and id-length)
 npm run format          # prettier --write .
 npm run format:check    # prettier --check .
 npm run test            # vitest run
